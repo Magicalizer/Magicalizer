@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Authors>Dmitry Sikorsky</Authors>
+    <Copyright>Copyright © 2020 Dmitry Sikorsky</Copyright>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <VersionPrefix>1.0.0-alpha1</VersionPrefix>
+    <PackageIconUrl>http://magicalizer.net/magicalizer_nuget_icon.png</PackageIconUrl>
+    <PackageProjectUrl>http://magicalizer.net/</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ExtCore.Mvc" Version="5.1.0" />
+    <PackageReference Include="ExtCore.WebApplication" Version="5.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Magicalizer.Api.Dto.Abstractions\Magicalizer.Api.Dto.Abstractions.csproj" />
+    <ProjectReference Include="..\Magicalizer.Data.Repositories.EntityFramework\Magicalizer.Data.Repositories.EntityFramework.csproj" />
+    <ProjectReference Include="..\Magicalizer.Domain.Services.Defaults\Magicalizer.Domain.Services.Defaults.csproj" />
+    <ProjectReference Include="..\Magicalizer.Shared\Magicalizer.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
