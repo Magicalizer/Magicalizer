@@ -41,7 +41,10 @@ namespace Magicalizer.Data.Repositories.EntityFramework
     
     public virtual async Task<int> CountAsync(TFilter filter = null)
     {
-      return await this.dbSet.AsNoTracking().CountAsync();
+      return await this.dbSet
+        .AsNoTracking()
+        .ApplyFiltering(filter)
+        .CountAsync();
     }
 
     public virtual void Create(TEntity entity)
