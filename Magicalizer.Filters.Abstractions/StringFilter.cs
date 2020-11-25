@@ -5,13 +5,17 @@ namespace Magicalizer.Filters.Abstractions
 {
   public class StringFilter : IFilter
   {
+    public bool? IsNull { get; set; }
+    public bool? IsNotNull { get; set; }
     new public string Equals { get; set; }
     public string Contains { get; set; }
 
     public StringFilter() { }
 
-    public StringFilter(string equals = null, string contains = null)
+    public StringFilter(bool? isNull = null, bool? isNotNull = null, string equals = null, string contains = null)
     {
+      this.IsNull = isNull;
+      this.IsNotNull = isNotNull;
       this.Equals = equals;
       this.Contains = contains;
     }

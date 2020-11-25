@@ -107,7 +107,19 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
 
       string whereClause;
 
-      if (property.Name == "Equals")
+      if (property.Name == "IsNull")
+      {
+        whereClause = string.Format(whereClauseTemplate, $" = null");
+        parameterIndex.Value++;
+      }
+
+      else if (property.Name == "IsNotNull")
+      {
+        whereClause = string.Format(whereClauseTemplate, $" != null");
+        parameterIndex.Value++;
+      }
+
+      else if (property.Name == "Equals")
       {
         if (value is DateTime)
           whereClause = string.Format(whereClauseTemplate, $".Date = @{parameterIndex.Value++}");
