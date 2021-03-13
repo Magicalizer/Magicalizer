@@ -194,6 +194,7 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
       return property.PropertyType == typeof(bool?) ||
           property.PropertyType == typeof(int?) ||
           property.PropertyType == typeof(decimal?) ||
+          property.PropertyType == typeof(Guid?) ||
           property.PropertyType == typeof(DateTime?) ||
           property.PropertyType == typeof(string);
     }

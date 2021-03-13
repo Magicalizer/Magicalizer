@@ -4,13 +4,13 @@
     <Authors>Dmitry Sikorsky</Authors>
     <Copyright>Copyright © 2020 Dmitry Sikorsky</Copyright>
     <TargetFramework>net5.0</TargetFramework>
-    <VersionPrefix>1.0.0-alpha3</VersionPrefix>
+    <VersionPrefix>1.0.0-alpha4</VersionPrefix>
     <PackageIconUrl>http://magicalizer.net/magicalizer_nuget_icon.png</PackageIconUrl>
     <PackageProjectUrl>http://magicalizer.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExtCore.Data.EntityFramework" Version="6.0.0-beta1" />
+    <PackageReference Include="ExtCore.Data.EntityFramework" Version="6.0.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.5" />
   </ItemGroup>
 
