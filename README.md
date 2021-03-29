@@ -1,6 +1,6 @@
 # Magicalizer 1.0.0-alpha4
 
-![Magicalizer logotype](magicalizer.png)
+![Magicalizer logotype](https://magicalizer.net/magicalizer_github_icon.png)
 
 ## Introduction
 
