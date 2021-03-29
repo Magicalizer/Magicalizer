@@ -324,3 +324,5 @@ DELETE: /v1/categories/1
 ## Links
 
 Author: http://sikorsky.pro/
+
+Patreon: https://www.patreon.com/dmitry_sikorsky (you can support this project)
