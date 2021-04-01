@@ -290,13 +290,21 @@ public class ProductValidator : AbstractValidator<Product>
 Run the web application and try the following requests (you can use a test database from the sample project).
 
 GET: /v1/categories
+
 GET: /v1/categories?name.contains=izza
+
 GET: /v1/categories/1
+
 GET: /v1/categories/5?fields=products
+
 GET: /v1/products
+
 GET: /v1/products?category.id=5&sorting=+name&offset=0&limit=5
+
 GET: /v1/products?category.id=5&sorting=-name&offset=0&limit=5
+
 GET: /v1/products?category.name.equals=Pizza&name.contains=ana&fields=category
+
 POST: /v1/categories
 
 ```
