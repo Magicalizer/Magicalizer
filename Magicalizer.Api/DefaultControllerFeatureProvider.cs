@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using ExtCore.Infrastructure;
 using Magicalizer.Api.Controllers;
 using Magicalizer.Api.Dto.Abstractions;
+using Magicalizer.Data.Entities.Abstractions;
 using Magicalizer.Domain.Models.Abstractions;
 using Magicalizer.Filters.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
@@ -21,11 +23,26 @@ namespace Magicalizer.Api
       foreach (Type dtoType in ExtensionManager.GetImplementations<IDto>(useCaching: true))
       {
         Type modelType = dtoType.GetGenericInterfaceGenericArgument(typeof(IDto<>), typeof(IModel));
+        Type entityType = modelType.GetGenericInterfaceGenericArgument(typeof(IModel<,>), typeof(IEntity));
         Type filterType = modelType.GetGenericInterfaceGenericArgument(typeof(IModel<,>), typeof(IFilter));
 
-        feature.Controllers.Add(
-          typeof(DefaultController<,,,>).MakeGenericType(typeof(int), modelType, dtoType, filterType).GetTypeInfo()
-        );
+        if (entityType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntity<>)))
+        {
+          IEnumerable<Type> keyTypes = entityType.GetGenericInterfaceArguments(typeof(IEntity<>));
+          
+          feature.Controllers.Add(
+            typeof(DefaultController<,,,>).MakeGenericType(keyTypes.First(), modelType, dtoType, filterType).GetTypeInfo()
+          );
+        }
+
+        else if (entityType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntity<,>)))
+        {
+          IEnumerable<Type> keyTypes = entityType.GetGenericInterfaceArguments(typeof(IEntity<,>));
+
+          feature.Controllers.Add(
+            typeof(DefaultController<,,,,>).MakeGenericType(keyTypes.First(), keyTypes.Last(), modelType, dtoType, filterType).GetTypeInfo()
+          );
+        }
       }
     }
   }

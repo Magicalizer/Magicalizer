@@ -4,13 +4,13 @@
     <Authors>Dmitry Sikorsky</Authors>
     <Copyright>Copyright © 2020 Dmitry Sikorsky</Copyright>
     <TargetFramework>net5.0</TargetFramework>
-    <VersionPrefix>1.0.0-alpha4</VersionPrefix>
+    <VersionPrefix>1.0.0-alpha5</VersionPrefix>
     <PackageIconUrl>http://magicalizer.net/magicalizer_nuget_icon.png</PackageIconUrl>
     <PackageProjectUrl>http://magicalizer.net/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation.AspNetCore" Version="9.3.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="10.0.2" />
   </ItemGroup>
 
 </Project>

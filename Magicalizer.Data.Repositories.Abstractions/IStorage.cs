@@ -11,5 +11,9 @@ namespace Magicalizer.Data.Repositories.Abstractions
     IRepository<TKey, TEntity, TFilter> GetRepository<TKey, TEntity, TFilter>()
       where TEntity : class, IEntity, new()
       where TFilter : class, IFilter;
+
+    IRepository<TKey1, TKey2, TEntity, TFilter> GetRepository<TKey1, TKey2, TEntity, TFilter>()
+      where TEntity : class, IEntity, new()
+      where TFilter : class, IFilter;
   }
 }

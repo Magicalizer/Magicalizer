@@ -11,5 +11,9 @@ namespace Magicalizer.Domain.Services.Abstractions
     IService<TKey, TModel, TFilter> GetService<TKey, TModel, TFilter>()
       where TModel : class, IModel
       where TFilter : class, IFilter;
+
+    IService<TKey1, TKey2, TModel, TFilter> GetService<TKey1, TKey2, TModel, TFilter>()
+      where TModel : class, IModel
+      where TFilter : class, IFilter;
   }
 }

@@ -19,4 +19,16 @@ namespace Magicalizer.Domain.Services.Abstractions
     Task EditAsync(TModel model);
     Task<bool> DeleteAsync(TKey id);
   }
+
+  public interface IService<TKey1, TKey2, TModel, TFilter>
+    where TModel : class, IModel
+    where TFilter : class, IFilter
+  {
+    Task<TModel> GetByIdAsync(TKey1 id1, TKey2 id2, params string[] inclusions);
+    Task<IEnumerable<TModel>> GetAllAsync(TFilter filter = null, string sorting = null, int? offset = null, int? limit = null, params string[] inclusions);
+    Task<int> CountAsync(TFilter filter = null);
+    Task<TModel> CreateAsync(TModel model);
+    Task EditAsync(TModel model);
+    Task<bool> DeleteAsync(TKey1 id1, TKey2 id2);
+  }
 }

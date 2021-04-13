@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
+using System.Text;
 using Magicalizer.Data.Entities.Abstractions;
 using Magicalizer.Data.Repositories.Abstractions;
 using Magicalizer.Filters.Abstractions;
@@ -21,7 +22,7 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
       List<object> parameters = new List<object>();
 
       if (filter != null)
-        CombineWhereClauses(filter, "{0}", new ParameterIndex(), whereClauses, parameters);
+        CombineWhereClauses(filter, "{0}", new Indexer(), new Indexer(), whereClauses, parameters);
 
       foreach (string whereClause in whereClauses)
         result = result.Where(whereClause, parameters.ToArray());
@@ -76,7 +77,7 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
       return result;
     }
 
-    private static void CombineWhereClauses<TEntityFilter>(TEntityFilter filter, string whereClauseTemplate, ParameterIndex parameterIndex, List<string> whereClauses, List<object> parameters) where TEntityFilter : class, IFilter
+    private static void CombineWhereClauses<TEntityFilter>(TEntityFilter filter, string whereClauseTemplate, Indexer shortcutIndexer, Indexer parameterIndexer, List<string> whereClauses, List<object> parameters) where TEntityFilter : class, IFilter
     {
       foreach (PropertyInfo property in filter.GetType().GetProperties())
       {
@@ -85,7 +86,7 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
           object value = property.GetValue(filter);
 
           if (value != null)
-            CombineWhereClauseForValue(whereClauseTemplate, parameterIndex, whereClauses, parameters, property, value);
+            CombineWhereClauseForValue(whereClauseTemplate, shortcutIndexer, parameterIndexer, whereClauses, parameters, property, value);
         }
 
         else if (IsFilter(property))
@@ -93,55 +94,55 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
           IFilter subFilter = property.GetValue(filter) as IFilter;
 
           if (subFilter != null && property.GetCustomAttribute<IgnoreFilterAttribute>() == null)
-            CombineWhereClauseForFilter(whereClauseTemplate, parameterIndex, whereClauses, parameters, property, subFilter);
+            CombineWhereClauseForFilter(whereClauseTemplate, shortcutIndexer, parameterIndexer, whereClauses, parameters, property, subFilter);
         }
       }
     }
 
-    private static void CombineWhereClauseForValue(string whereClauseTemplate, ParameterIndex parameterIndex, List<string> whereClauses, List<object> parameters, PropertyInfo property, object value)
+    private static void CombineWhereClauseForValue(string whereClauseTemplate, Indexer shortcutIndexer, Indexer parameterIndexer, List<string> whereClauses, List<object> parameters, PropertyInfo property, object value)
     {
       FilterShortcutAttribute shortcutAttribute = property.GetCustomAttribute<FilterShortcutAttribute>();
 
       if (shortcutAttribute != null && !string.IsNullOrEmpty(shortcutAttribute.Path))
-        whereClauseTemplate = string.Format(whereClauseTemplate, ComposeWhereClauseTemplateForShortcutAttributePath(shortcutAttribute));
+        whereClauseTemplate = string.Format(whereClauseTemplate, ComposeWhereClauseTemplateForShortcutAttributePath(shortcutIndexer, shortcutAttribute));
 
       string whereClause;
 
       if (property.Name == "IsNull")
       {
         whereClause = string.Format(whereClauseTemplate, $" = null");
-        parameterIndex.Value++;
+        parameterIndexer.Value++;
       }
 
       else if (property.Name == "IsNotNull")
       {
         whereClause = string.Format(whereClauseTemplate, $" != null");
-        parameterIndex.Value++;
+        parameterIndexer.Value++;
       }
 
       else if (property.Name == "Equals")
       {
         if (value is DateTime)
-          whereClause = string.Format(whereClauseTemplate, $".Date = @{parameterIndex.Value++}");
+          whereClause = string.Format(whereClauseTemplate, $".Date = @{parameterIndexer.Value++}");
 
-        else whereClause = string.Format(whereClauseTemplate, $" = @{parameterIndex.Value++}");
+        else whereClause = string.Format(whereClauseTemplate, $" = @{parameterIndexer.Value++}");
       }
 
       else if (property.Name == "From")
-        whereClause = string.Format(whereClauseTemplate, $" >= @{parameterIndex.Value++}");
+        whereClause = string.Format(whereClauseTemplate, $" >= @{parameterIndexer.Value++}");
 
       else if (property.Name == "To")
-        whereClause = string.Format(whereClauseTemplate, $" <= @{parameterIndex.Value++}");
+        whereClause = string.Format(whereClauseTemplate, $" <= @{parameterIndexer.Value++}");
 
       else if (property.Name == "Contains")
-        whereClause = string.Format(whereClauseTemplate, $".Contains(@{parameterIndex.Value++})");
+        whereClause = string.Format(whereClauseTemplate, $".Contains(@{parameterIndexer.Value++})");
 
       else
       {
         if (whereClauseTemplate != "{0}")
           whereClauseTemplate = string.Format(whereClauseTemplate, ".{0}");
 
-        whereClause = string.Format(whereClauseTemplate, $"{property.Name} = @{parameterIndex.Value++}");
+        whereClause = string.Format(whereClauseTemplate, $"{property.Name} = @{parameterIndexer.Value++}");
       }
 
       whereClauses.Add(whereClause);
@@ -152,7 +153,7 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
       else parameters.Add(value);
     }
 
-    private static void CombineWhereClauseForFilter(string whereClauseTemplate, ParameterIndex parameterIndex, List<string> whereClauses, List<object> parameters, PropertyInfo property, IFilter filter)
+    private static void CombineWhereClauseForFilter(string whereClauseTemplate, Indexer shortcutIndexer, Indexer parameterIndexer, List<string> whereClauses, List<object> parameters, PropertyInfo property, IFilter filter)
     {
       if (whereClauseTemplate != "{0}")
         whereClauseTemplate = string.Format(whereClauseTemplate, ".{0}");
@@ -162,37 +163,39 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
       if (shortcutAttribute == null || string.IsNullOrEmpty(shortcutAttribute.Path))
         whereClauseTemplate = string.Format(whereClauseTemplate, property.Name + "{0}");
 
-      else whereClauseTemplate = string.Format(whereClauseTemplate, ComposeWhereClauseTemplateForShortcutAttributePath(shortcutAttribute));
+      else whereClauseTemplate = string.Format(whereClauseTemplate, ComposeWhereClauseTemplateForShortcutAttributePath(shortcutIndexer, shortcutAttribute));
 
-      CombineWhereClauses(filter, whereClauseTemplate, parameterIndex, whereClauses, parameters);
+      CombineWhereClauses(filter, whereClauseTemplate, shortcutIndexer, parameterIndexer, whereClauses, parameters);
     }
 
-    private static string ComposeWhereClauseTemplateForShortcutAttributePath(FilterShortcutAttribute shortcutAttribute)
+    private static string ComposeWhereClauseTemplateForShortcutAttributePath(Indexer shortcutIndexer, FilterShortcutAttribute shortcutAttribute)
     {
-      string whereClauseTemplate = string.Empty;
+      StringBuilder whereClauseTemplate = new StringBuilder();
       string[] clauses = shortcutAttribute.Path.Split("[]");
-      int argumentIndex = 0;
 
-      for (int i = 0; i != clauses.Length; i++, argumentIndex++)
+      for (int i = 0; i != clauses.Length; i++)
       {
         if (i != 0)
-          whereClauseTemplate += $".Any(x{argumentIndex} => x{argumentIndex}";
+        {
+          shortcutIndexer.Value++;
+          whereClauseTemplate.Append($".Any(x{shortcutIndexer.Value} => x{shortcutIndexer.Value}");
+        }
 
-        whereClauseTemplate += clauses[i];
+        whereClauseTemplate.Append(clauses[i]);
       }
 
-      whereClauseTemplate += "{0}";
-
-      for (int i = 0; i != clauses.Length - 1; i++)
-        whereClauseTemplate += ')';
-
-      return whereClauseTemplate;
+      whereClauseTemplate.Append("{0}");
+      whereClauseTemplate.Append(new string(')', clauses.Length - 1));
+      return whereClauseTemplate.ToString();
     }
 
     private static bool IsValue(PropertyInfo property)
     {
       return property.PropertyType == typeof(bool?) ||
+          property.PropertyType == typeof(byte?) ||
+          property.PropertyType == typeof(short?) ||
           property.PropertyType == typeof(int?) ||
+          property.PropertyType == typeof(long?) ||
           property.PropertyType == typeof(decimal?) ||
           property.PropertyType == typeof(Guid?) ||
           property.PropertyType == typeof(DateTime?) ||

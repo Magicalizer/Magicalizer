@@ -16,7 +16,7 @@ namespace Magicalizer.Api.Actions
 
     public void Execute(IMvcBuilder mvcBuilder, IServiceProvider serviceProvider)
     {
-      ValidatorOptions.LanguageManager = new CustomLanguageManager();
+      ValidatorOptions.Global.LanguageManager = new CustomLanguageManager();
       mvcBuilder.AddFluentValidation(fv => {
         fv.RegisterValidatorsFromAssemblies(ExtensionManager.Assemblies);
         fv.LocalizationEnabled = false;

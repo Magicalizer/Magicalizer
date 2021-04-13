@@ -37,5 +37,27 @@ namespace Magicalizer.Data.Repositories.EntityFramework
         return repository;
       }
     }
+
+    public IRepository<TKey1, TKey2, TEntity, TFilter> GetRepository<TKey1, TKey2, TEntity, TFilter>()
+     where TEntity : class, IEntity, new()
+     where TFilter : class, IFilter
+    {
+
+      foreach (Type type in ExtensionManager.GetImplementations<IRepository<TKey1, TKey2, TEntity, TFilter>>(useCaching: true))
+        if (type != typeof(Repository<TKey1, TKey2, TEntity, TFilter>))
+        {
+          IRepository<TKey1, TKey2, TEntity, TFilter> repository = Activator.CreateInstance(type) as IRepository<TKey1, TKey2, TEntity, TFilter>;
+
+          repository.SetStorageContext(this.StorageContext);
+          return repository;
+        }
+
+      {
+        IRepository<TKey1, TKey2, TEntity, TFilter> repository = new Repository<TKey1, TKey2, TEntity, TFilter>();
+
+        repository.SetStorageContext(this.StorageContext);
+        return repository;
+      }
+    }
   }
 }

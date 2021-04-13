@@ -9,6 +9,9 @@ namespace Magicalizer.Data.Entities.Abstractions
 
   public interface IEntity<TKey> : IEntity
   {
-    TKey Id { get; }
+  }
+
+  public interface IEntity<TKey1, TKey2> : IEntity<TKey1>
+  {
   }
 }
