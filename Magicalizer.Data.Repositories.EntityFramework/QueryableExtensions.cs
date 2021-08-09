@@ -57,13 +57,16 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
         if (criterions.Length == 1)
           return result.OrderBy(ConvertSortingCriterion(criterions[0]));
 
-        if (criterions.Length == 2)
-          return result.OrderBy(ConvertSortingCriterion(criterions[0]))
-            .ThenBy(ConvertSortingCriterion(criterions[1]));
+        IOrderedQueryable<TEntity> orderedResult = null;
 
-        return result.OrderBy(ConvertSortingCriterion(criterions[0]))
-            .ThenBy(ConvertSortingCriterion(criterions[1]))
-            .ThenBy(ConvertSortingCriterion(criterions[2]));
+        for (int i = 0; i != criterions.Length; i++)
+        {
+            orderedResult = orderedResult == null ?
+              result.OrderBy(ConvertSortingCriterion(criterions[i])) :
+              orderedResult.ThenBy(ConvertSortingCriterion(criterions[i]));
+        }
+
+        return orderedResult;
       }
 
       return result;
@@ -197,6 +200,8 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
           property.PropertyType == typeof(int?) ||
           property.PropertyType == typeof(long?) ||
           property.PropertyType == typeof(decimal?) ||
+          property.PropertyType == typeof(float?) ||
+          property.PropertyType == typeof(double?) ||
           property.PropertyType == typeof(Guid?) ||
           property.PropertyType == typeof(DateTime?) ||
           property.PropertyType == typeof(string);
