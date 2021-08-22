@@ -1,4 +1,4 @@
-# Magicalizer 1.0.0-beta1
+# Magicalizer 1.0.0
 
 ![Magicalizer logotype](https://magicalizer.net/magicalizer_github_icon.png)
 
