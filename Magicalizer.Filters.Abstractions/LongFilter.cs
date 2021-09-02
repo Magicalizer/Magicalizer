@@ -1,20 +1,20 @@
-﻿// Copyright © 2020 Dmitry Sikorsky. All rights reserved.
+﻿// Copyright © 2021 Dmitry Sikorsky. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 namespace Magicalizer.Filters.Abstractions
 {
-  public class IntegerFilter : IFilter
+  public class LongFilter : IFilter
   {
     public bool? IsNull { get; set; }
     public bool? IsNotNull { get; set; }
-    new public int? Equals { get; set; }
-    public int? NotEquals { get; set; }
-    public int? From { get; set; }
-    public int? To { get; set; }
+    new public long? Equals { get; set; }
+    public long? NotEquals { get; set; }
+    public long? From { get; set; }
+    public long? To { get; set; }
 
-    public IntegerFilter() { }
+    public LongFilter() { }
 
-    public IntegerFilter(bool? isNull = null, bool? isNotNull = null, int? equals = null, int? notEquals = null, int? from = null, int? to = null)
+    public LongFilter(bool? isNull = null, bool? isNotNull = null, long? equals = null, long? notEquals = null, long? from = null, long? to = null)
     {
       this.IsNull = isNull;
       this.IsNotNull = isNotNull;

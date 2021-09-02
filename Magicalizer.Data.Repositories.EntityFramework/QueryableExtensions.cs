@@ -131,6 +131,14 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
         else whereClause = string.Format(whereClauseTemplate, $" = @{parameterIndexer.Value++}");
       }
 
+      else if (property.Name == "NotEquals")
+      {
+        if (value is DateTime)
+          whereClause = string.Format(whereClauseTemplate, $".Date != @{parameterIndexer.Value++}");
+
+        else whereClause = string.Format(whereClauseTemplate, $" != @{parameterIndexer.Value++}");
+      }
+
       else if (property.Name == "From")
         whereClause = string.Format(whereClauseTemplate, $" >= @{parameterIndexer.Value++}");
 
@@ -150,7 +158,7 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
 
       whereClauses.Add(whereClause);
 
-      if (value is DateTime && property.Name == "Equals")
+      if (value is DateTime && (property.Name == "Equals" || property.Name == "NotEquals"))
         parameters.Add(((DateTime)value).Date);
 
       else parameters.Add(value);

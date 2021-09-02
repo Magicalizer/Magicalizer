@@ -8,15 +8,17 @@ namespace Magicalizer.Filters.Abstractions
     public bool? IsNull { get; set; }
     public bool? IsNotNull { get; set; }
     new public string Equals { get; set; }
+    public string NotEquals { get; set; }
     public string Contains { get; set; }
 
     public StringFilter() { }
 
-    public StringFilter(bool? isNull = null, bool? isNotNull = null, string equals = null, string contains = null)
+    public StringFilter(bool? isNull = null, bool? isNotNull = null, string equals = null, string notEquals = null, string contains = null)
     {
       this.IsNull = isNull;
       this.IsNotNull = isNotNull;
       this.Equals = equals;
+      this.NotEquals = notEquals;
       this.Contains = contains;
     }
   }

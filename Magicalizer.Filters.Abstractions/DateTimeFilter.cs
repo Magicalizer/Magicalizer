@@ -10,16 +10,18 @@ namespace Magicalizer.Filters.Abstractions
     public bool? IsNull { get; set; }
     public bool? IsNotNull { get; set; }
     new public DateTime? Equals { get; set; }
+    public DateTime? NotEquals { get; set; }
     public DateTime? From { get; set; }
     public DateTime? To { get; set; }
 
     public DateTimeFilter() { }
 
-    public DateTimeFilter(bool? isNull = null, bool? isNotNull = null, DateTime? equals = null, DateTime? from = null, DateTime? to = null)
+    public DateTimeFilter(bool? isNull = null, bool? isNotNull = null, DateTime? equals = null, DateTime? notEquals = null, DateTime? from = null, DateTime? to = null)
     {
       this.IsNull = isNull;
       this.IsNotNull = isNotNull;
       this.Equals = equals;
+      this.NotEquals = notEquals;
       this.From = from;
       this.To = to;
     }
