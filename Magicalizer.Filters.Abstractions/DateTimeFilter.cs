@@ -5,17 +5,55 @@ using System;
 
 namespace Magicalizer.Filters.Abstractions
 {
+  /// <summary>
+  /// Represents a <see cref="DateTime"/> filter.
+  /// </summary>
   public class DateTimeFilter : IFilter
   {
+    /// <summary>
+    /// Determines if a property value should be null.
+    /// </summary>
     public bool? IsNull { get; set; }
+
+    /// <summary>
+    /// Determines if a property value should be non-null.
+    /// </summary>
     public bool? IsNotNull { get; set; }
+
+    /// <summary>
+    /// Determines if a property value should be equal to the given one.
+    /// </summary>
     new public DateTime? Equals { get; set; }
+
+    /// <summary>
+    /// Determines if a property value should not be equal to the given one.
+    /// </summary>
     public DateTime? NotEquals { get; set; }
+
+    /// <summary>
+    /// Determines if a property value should be greater than the given one.
+    /// </summary>
     public DateTime? From { get; set; }
+
+    /// <summary>
+    /// Determines if a property value should be less than the given one.
+    /// </summary>
     public DateTime? To { get; set; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DateTimeFilter"/> class.
+    /// </summary>
     public DateTimeFilter() { }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DateTimeFilter"/> class.
+    /// </summary>
+    /// <param name="isNull">Determines if a property value should be null.</param>
+    /// <param name="isNotNull">Determines if a property value should be non-null.</param>
+    /// <param name="equals">Determines if a property value should be equal to the given one.</param>
+    /// <param name="notEquals">Determines if a property value should not be equal to the given one.</param>
+    /// <param name="from">Determines if a property value should be greater than the given one.</param>
+    /// <param name="to">Determines if a property value should be less than the given one.</param>
     public DateTimeFilter(bool? isNull = null, bool? isNotNull = null, DateTime? equals = null, DateTime? notEquals = null, DateTime? from = null, DateTime? to = null)
     {
       this.IsNull = isNull;

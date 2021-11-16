@@ -8,6 +8,9 @@ namespace Magicalizer.Api.Extensions
 {
   public static class ServiceCollectionExtensions
   {
+    /// <summary>
+    /// Registers and configures all the services that are required to process the REST API requests.
+    /// </summary>
     public static void AddMagicalizer(this IServiceCollection services)
     {
       services.AddExtCore();

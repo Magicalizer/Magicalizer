@@ -8,6 +8,9 @@ namespace Magicalizer.Api.Extensions
 {
   public static class ApplicationBuilderExtensions
   {
+    /// <summary>
+    /// Registers the middleware that is required to process the REST API requests.
+    /// </summary>
     public static void UseMagicalizer(this IApplicationBuilder applicationBuilder)
     {
       applicationBuilder.UseExtCore();

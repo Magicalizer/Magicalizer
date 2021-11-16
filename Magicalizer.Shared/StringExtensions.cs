@@ -5,8 +5,15 @@ using System.Linq;
 
 namespace Magicalizer
 {
+  /// <summary>
+  /// Contains the extension methods of the <see cref="string"/>.
+  /// </summary>
   public static class StringExtensions
   {
+    /// <summary>
+    /// Converts a given string into a camel case. Example: "SomeValue" => "someValue".
+    /// </summary>
+    /// <param name="value">A string to convert.</param>
     public static string ToCamelCase(this string value)
     {
       if (string.IsNullOrEmpty(value))

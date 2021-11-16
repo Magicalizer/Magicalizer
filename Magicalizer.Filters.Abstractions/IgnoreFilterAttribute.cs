@@ -5,6 +5,9 @@ using System;
 
 namespace Magicalizer.Filters.Abstractions
 {
+  /// <summary>
+  /// Allows to ignore a filter's property.
+  /// </summary>
   [AttributeUsage(AttributeTargets.Property)]
   public class IgnoreFilterAttribute : Attribute
   {
