@@ -4,13 +4,18 @@
     <Authors>Dmitry Sikorsky</Authors>
     <Copyright>Copyright © 2020 Dmitry Sikorsky</Copyright>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <VersionPrefix>1.2.0</VersionPrefix>
-    <PackageIconUrl>http://magicalizer.net/magicalizer_nuget_icon.png</PackageIconUrl>
-    <PackageProjectUrl>http://magicalizer.net/</PackageProjectUrl>
+    <VersionPrefix>2.0.0</VersionPrefix>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://magicalizer.net/</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExtCore.Data.Abstractions" Version="6.0.0" />
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ExtCore.Data.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

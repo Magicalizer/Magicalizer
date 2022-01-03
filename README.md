@@ -1,4 +1,4 @@
-# Magicalizer 1.2.0
+# Magicalizer 2.0.0
 
 ![Magicalizer logotype](https://magicalizer.net/magicalizer_github_icon.png)
 
@@ -332,5 +332,3 @@ DELETE: /v1/categories/1
 ## Links
 
 Author: http://sikorsky.pro/
-
-Patreon: https://www.patreon.com/dmitry_sikorsky (you can support this project)
