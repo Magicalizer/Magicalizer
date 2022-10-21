@@ -34,7 +34,7 @@ Web application is ready.
 
 Now create the entities classes:
 
-```
+````csharp
 public class Category : IEntity<int>
 {
   public int Id { get; set; }
@@ -42,9 +42,9 @@ public class Category : IEntity<int>
 
   public virtual ICollection<Product> Products { get; set; }
 }
-```
+````
 
-```
+````csharp
 public class Product : IEntity<int>
 {
   public int Id { get; set; }
@@ -55,11 +55,11 @@ public class Product : IEntity<int>
 
   public virtual Category Category { get; set; }
 }
-```
+````
 
 Register them inside the storage context:
 
-```
+````csharp
 public class EntityRegistrar : IEntityRegistrar
 {
   public void RegisterEntities(ModelBuilder modelBuilder)
@@ -81,11 +81,11 @@ public class EntityRegistrar : IEntityRegistrar
     );
   }
 }
-```
+````
 
 Create the models classes:
 
-```
+````csharp
 public class Category : IModel<Data.Entities.Category, Filters.CategoryFilter>
 {
   public int Id { get; set; }
@@ -110,9 +110,9 @@ public class Category : IModel<Data.Entities.Category, Filters.CategoryFilter>
     };
   }
 }
-```
+````
 
-```
+````csharp
 public class Product : IModel<Data.Entities.Product, Filters.ProductFilter>
 {
   public int Id { get; set; }
@@ -144,11 +144,11 @@ public class Product : IModel<Data.Entities.Product, Filters.ProductFilter>
     };
   }
 }
-```
+````
 
 Create the model validators classes:
 
-```
+````csharp
 public class CategoryValidator : AbstractValidator<Category>
 {
   public CategoryValidator()
@@ -159,9 +159,9 @@ public class CategoryValidator : AbstractValidator<Category>
     });
   }
 }
-```
+````
 
-```
+````csharp
 public class ProductValidator : AbstractValidator<Product>
 {
   public ProductValidator()
@@ -177,11 +177,11 @@ public class ProductValidator : AbstractValidator<Product>
     });
   }
 }
-```
+````
 
 Create the DTOs classes:
 
-```
+````csharp
 [Magicalized("v1/categories")]
 public class Category : IDto<Domain.Models.Category>
 {
@@ -212,9 +212,9 @@ public class Category : IDto<Domain.Models.Category>
     };
   }
 }
-```
+````
 
-```
+````csharp
 [Magicalized("v1/products")]
 public class Product : IDto<Domain.Models.Product>
 {
@@ -252,11 +252,11 @@ public class Product : IDto<Domain.Models.Product>
     };
   }
 }
-```
+````
 
 Create the DTO validators classes:
 
-```
+````csharp
 public class IngredientValidator : AbstractValidator<Category>
 {
   public IngredientValidator()
@@ -267,9 +267,9 @@ public class IngredientValidator : AbstractValidator<Category>
     });
   }
 }
-```
+````
 
-```
+````csharp
 public class ProductValidator : AbstractValidator<Product>
 {
   public ProductValidator()
@@ -285,7 +285,7 @@ public class ProductValidator : AbstractValidator<Product>
     });
   }
 }
-```
+````
 
 Run the web application and try the following requests (you can use a test database from the sample project).
 
@@ -307,21 +307,21 @@ GET: /v1/products?category.name.equals=Pizza&name.contains=ana&fields=category
 
 POST: /v1/categories
 
-```
+````json
 {"name": "Sushi"}
-```
+````
 
 PUT: /v1/categories
 
-```
+````json
 {"id": 1, "name": "Not sushi"}
-```
+````
 
 PATCH: /v1/categories/1
 
-```
+````json
 [{"op": "replace", "path":"name", "value":"Sushi again o_O"}]
-```
+````
 
 DELETE: /v1/categories/1
 
