@@ -40,7 +40,16 @@ namespace Magicalizer.Api
           IEnumerable<Type> keyTypes = entityType.GetGenericInterfaceTypeParameters(typeof(IEntity<,>));
 
           feature.Controllers.Add(
-            typeof(DefaultController<,,,,>).MakeGenericType(keyTypes.First(), keyTypes.Last(), modelType, dtoType, filterType).GetTypeInfo()
+            typeof(DefaultController<,,,,>).MakeGenericType(keyTypes.ElementAt(0), keyTypes.ElementAt(1), modelType, dtoType, filterType).GetTypeInfo()
+          );
+        }
+
+        else if (entityType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntity<,,>)))
+        {
+          IEnumerable<Type> keyTypes = entityType.GetGenericInterfaceTypeParameters(typeof(IEntity<,,>));
+
+          feature.Controllers.Add(
+            typeof(DefaultController<,,,,>).MakeGenericType(keyTypes.ElementAt(0), keyTypes.ElementAt(1), keyTypes.ElementAt(2), modelType, dtoType, filterType).GetTypeInfo()
           );
         }
       }

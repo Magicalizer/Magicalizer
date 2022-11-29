@@ -10,7 +10,7 @@ using Magicalizer.Filters.Abstractions;
 
 namespace Magicalizer.Data.Repositories.EntityFramework
 {
-  public class Storage : ExtCore.Data.EntityFramework.Storage, Magicalizer.Data.Repositories.Abstractions.IStorage
+  public class Storage : ExtCore.Data.EntityFramework.Storage, Abstractions.IStorage
   {
     public Storage(IStorageContext storageContext) : base(storageContext)
     {
@@ -54,6 +54,28 @@ namespace Magicalizer.Data.Repositories.EntityFramework
 
       {
         IRepository<TKey1, TKey2, TEntity, TFilter> repository = new Repository<TKey1, TKey2, TEntity, TFilter>();
+
+        repository.SetStorageContext(this.StorageContext);
+        return repository;
+      }
+    }
+
+    public IRepository<TKey1, TKey2, TKey3, TEntity, TFilter> GetRepository<TKey1, TKey2, TKey3, TEntity, TFilter>()
+     where TEntity : class, IEntity, new()
+     where TFilter : class, IFilter
+    {
+
+      foreach (Type type in ExtensionManager.GetImplementations<IRepository<TKey1, TKey2, TKey3, TEntity, TFilter>>(useCaching: true))
+        if (type != typeof(Repository<TKey1, TKey2, TKey3, TEntity, TFilter>))
+        {
+          IRepository<TKey1, TKey2, TKey3, TEntity, TFilter> repository = Activator.CreateInstance(type) as IRepository<TKey1, TKey2, TKey3, TEntity, TFilter>;
+
+          repository.SetStorageContext(this.StorageContext);
+          return repository;
+        }
+
+      {
+        IRepository<TKey1, TKey2, TKey3, TEntity, TFilter> repository = new Repository<TKey1, TKey2, TKey3, TEntity, TFilter>();
 
         repository.SetStorageContext(this.StorageContext);
         return repository;

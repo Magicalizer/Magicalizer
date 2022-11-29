@@ -36,5 +36,19 @@ namespace Magicalizer.Domain.Services.Abstractions
     IService<TKey1, TKey2, TModel, TFilter> GetService<TKey1, TKey2, TModel, TFilter>()
       where TModel : class, IModel
       where TFilter : class, IFilter;
+
+    /// <summary>
+    /// Gets a service (specific or generic one). If there is the specific implementation of the
+    /// <see cref="IService{TKey1, TKey2, TKey3, TModel, TFilter}" />, it will be returned.
+    /// Otherwise, the generic implementation will be returned.
+    /// </summary>
+    /// <typeparam name="TKey1">The first model's unique identifier type.</typeparam>
+    /// <typeparam name="TKey2">The first model's unique identifier type.</typeparam>
+    /// <typeparam name="TKey3">The third model's unique identifier type.</typeparam>
+    /// <typeparam name="TModel">A model type.</typeparam>
+    /// <typeparam name="TFilter">A model filter type.</typeparam>
+    IService<TKey1, TKey2, TKey3, TModel, TFilter> GetService<TKey1, TKey2, TKey3, TModel, TFilter>()
+      where TModel : class, IModel
+      where TFilter : class, IFilter;
   }
 }

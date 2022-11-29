@@ -36,5 +36,19 @@ namespace Magicalizer.Data.Repositories.Abstractions
     IRepository<TKey1, TKey2, TEntity, TFilter> GetRepository<TKey1, TKey2, TEntity, TFilter>()
       where TEntity : class, IEntity, new()
       where TFilter : class, IFilter;
+
+    /// <summary>
+    /// Gets a repository (specific or generic one). If there is the specific implementation of the
+    /// <see cref="IRepository{TKey1, TKey2, TKey3, TModel, TFilter}" />, it will be returned.
+    /// Otherwise, the generic implementation will be returned.
+    /// </summary>
+    /// <typeparam name="TKey1">The first entity's composite primary key type.</typeparam>
+    /// <typeparam name="TKey2">The second entity's composite primary key type.</typeparam>
+    /// <typeparam name="TKey3">The third entity's composite primary key type.</typeparam>
+    /// <typeparam name="TEntity">An entity type.</typeparam>
+    /// <typeparam name="TFilter">An entity filter type.</typeparam>
+    IRepository<TKey1, TKey2, TKey3, TEntity, TFilter> GetRepository<TKey1, TKey2, TKey3, TEntity, TFilter>()
+      where TEntity : class, IEntity, new()
+      where TFilter : class, IFilter;
   }
 }

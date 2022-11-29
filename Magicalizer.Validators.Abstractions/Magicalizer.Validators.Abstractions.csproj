@@ -3,8 +3,8 @@
   <PropertyGroup>
     <Authors>Dmitry Sikorsky</Authors>
     <Copyright>Copyright © 2020 Dmitry Sikorsky</Copyright>
-    <TargetFramework>net6.0</TargetFramework>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <TargetFramework>net7.0</TargetFramework>
+    <VersionPrefix>3.0.0</VersionPrefix>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://magicalizer.net/</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

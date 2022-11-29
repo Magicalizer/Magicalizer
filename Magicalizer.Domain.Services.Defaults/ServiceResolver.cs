@@ -49,5 +49,19 @@ namespace Magicalizer.Domain.Services.Defaults
 
       return Activator.CreateInstance(serviceType, this.storage, this.serviceProvider) as IService<TKey1, TKey2, TModel, TFilter>;
     }
+
+    public IService<TKey1, TKey2, TKey3, TModel, TFilter> GetService<TKey1, TKey2, TKey3, TModel, TFilter>()
+      where TModel : class, IModel
+      where TFilter : class, IFilter
+    {
+      Type entityType = typeof(TModel).GetGenericInterfaceTypeParameter(typeof(IModel<>), typeof(IEntity));
+      Type serviceType = typeof(Service<,,,,,>).MakeGenericType(typeof(TKey1), typeof(TKey2), typeof(TKey3), entityType, typeof(TModel), typeof(TFilter));
+
+      foreach (Type type in ExtensionManager.GetImplementations<IService<TKey1, TKey2, TKey3, TModel, TFilter>>(useCaching: true))
+        if (type != serviceType)
+          return Activator.CreateInstance(type, this.storage, this.serviceProvider) as IService<TKey1, TKey2, TKey3, TModel, TFilter>;
+
+      return Activator.CreateInstance(serviceType, this.storage, this.serviceProvider) as IService<TKey1, TKey2, TKey3, TModel, TFilter>;
+    }
   }
 }

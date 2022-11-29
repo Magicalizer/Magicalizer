@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using ExtCore.Data.EntityFramework;
@@ -20,7 +21,7 @@ namespace Magicalizer.Data.Repositories.EntityFramework
   {
     public virtual async Task<TEntity> GetByIdAsync(TKey id, params Inclusion<TEntity>[] inclusions)
     {
-      IProperty key = this.storageContext.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties[0];
+      IProperty key = this.GetPrimaryKeyProperty(0);
 
       return await this.dbSet
         .AsNoTracking()
@@ -54,17 +55,29 @@ namespace Magicalizer.Data.Repositories.EntityFramework
 
     public virtual void Edit(TEntity entity)
     {
+      IProperty key = this.GetPrimaryKeyProperty(0);
+      PropertyInfo property = typeof(TEntity).GetProperty(key.Name);
+      TEntity local = this.dbSet.Local.FirstOrDefault(e => property.GetValue(e).Equals(property.GetValue(entity)));
+
+      if (local != null)
+        this.storageContext.Entry(local).State = EntityState.Detached;
+
       (this.storageContext as DbContext).Entry(entity).State = EntityState.Modified;
     }
 
     public virtual void Delete(TKey id)
     {
       TEntity entity = new TEntity();
-      IProperty key = this.storageContext.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties[0];
+      IProperty key = this.GetPrimaryKeyProperty(0);
       PropertyInfo property = typeof(TEntity).GetProperty(key.Name);
 
       property.SetValue(entity, id);
       this.dbSet.Remove(entity);
+    }
+
+    private IProperty GetPrimaryKeyProperty(int index)
+    {
+      return this.storageContext.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties[index];
     }
   }
 }
