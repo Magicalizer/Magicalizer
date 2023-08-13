@@ -31,6 +31,11 @@ namespace Magicalizer.Filters.Abstractions
     public Guid? NotEquals { get; set; }
 
     /// <summary>
+    /// Determines if a property value should be in the given comma-separated range.
+    /// </summary>
+    public string In { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="GuidFilter"/> class.
     /// </summary>
     public GuidFilter() { }
@@ -42,12 +47,13 @@ namespace Magicalizer.Filters.Abstractions
     /// <param name="isNotNull">Determines if a property value should be non-null.</param>
     /// <param name="equals">Determines if a property value should be equal to the given one.</param>
     /// <param name="notEquals">Determines if a property value should not be equal to the given one.</param>
-    public GuidFilter(bool? isNull = null, bool? isNotNull = null, Guid? equals = null, Guid? notEquals = null)
+    public GuidFilter(bool? isNull = null, bool? isNotNull = null, Guid? equals = null, Guid? notEquals = null, string @in = null)
     {
       this.IsNull = isNull;
       this.IsNotNull = isNotNull;
       this.Equals = equals;
       this.NotEquals = notEquals;
+      this.In = @in;
     }
   }
 }

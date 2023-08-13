@@ -39,6 +39,11 @@ namespace Magicalizer.Filters.Abstractions
     public short? To { get; set; }
 
     /// <summary>
+    /// Determines if a property value should be in the given comma-separated range.
+    /// </summary>
+    public string In { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ShortFilter"/> class.
     /// </summary>
     public ShortFilter() { }
@@ -52,7 +57,7 @@ namespace Magicalizer.Filters.Abstractions
     /// <param name="notEquals">Determines if a property value should not be equal to the given one.</param>
     /// <param name="from">Determines if a property value should be greater than the given one.</param>
     /// <param name="to">Determines if a property value should be less than the given one.</param>
-    public ShortFilter(bool? isNull = null, bool? isNotNull = null, short? equals = null, short? notEquals = null, short? from = null, short? to = null)
+    public ShortFilter(bool? isNull = null, bool? isNotNull = null, short? equals = null, short? notEquals = null, short? from = null, short? to = null, string @in = null)
     {
       this.IsNull = isNull;
       this.IsNotNull = isNotNull;
@@ -60,6 +65,7 @@ namespace Magicalizer.Filters.Abstractions
       this.NotEquals = notEquals;
       this.From = from;
       this.To = to;
+      this.In = @in;
     }
   }
 }

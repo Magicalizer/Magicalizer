@@ -61,9 +61,9 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
 
         for (int i = 0; i != criterions.Length; i++)
         {
-            orderedResult = orderedResult == null ?
-              result.OrderBy(ConvertSortingCriterion(criterions[i])) :
-              orderedResult.ThenBy(ConvertSortingCriterion(criterions[i]));
+          orderedResult = orderedResult == null ?
+            result.OrderBy(ConvertSortingCriterion(criterions[i])) :
+            orderedResult.ThenBy(ConvertSortingCriterion(criterions[i]));
         }
 
         return orderedResult;
@@ -89,7 +89,10 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
           object value = property.GetValue(filter);
 
           if (value != null)
-            CombineWhereClauseForValue(whereClauseTemplate, shortcutIndexer, parameterIndexer, whereClauses, parameters, property, value);
+          {
+            CombineWhereClauseForValue(whereClauseTemplate, shortcutIndexer, parameterIndexer, whereClauses, property);
+            parameters.Add(ProcessValue(filter, property, value));
+          }
         }
 
         else if (IsFilter(property))
@@ -102,7 +105,7 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
       }
     }
 
-    private static void CombineWhereClauseForValue(string whereClauseTemplate, Indexer shortcutIndexer, Indexer parameterIndexer, List<string> whereClauses, List<object> parameters, PropertyInfo property, object value)
+    private static void CombineWhereClauseForValue(string whereClauseTemplate, Indexer shortcutIndexer, Indexer parameterIndexer, List<string> whereClauses, PropertyInfo property)
     {
       FilterShortcutAttribute shortcutAttribute = property.GetCustomAttribute<FilterShortcutAttribute>();
 
@@ -112,56 +115,96 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
       string whereClause;
 
       if (property.Name == "IsNull")
-      {
-        whereClause = string.Format(whereClauseTemplate, $" = null");
-        parameterIndexer.Value++;
-      }
+        whereClause = CombineIsNullWhereClauseForValue(whereClauseTemplate, parameterIndexer);
 
       else if (property.Name == "IsNotNull")
-      {
-        whereClause = string.Format(whereClauseTemplate, $" != null");
-        parameterIndexer.Value++;
-      }
+        whereClause = CombineIsNotNullWhereClauseForValue(whereClauseTemplate, parameterIndexer);
 
       else if (property.Name == "Equals")
-      {
-        if (value is DateTime)
-          whereClause = string.Format(whereClauseTemplate, $".Date = @{parameterIndexer.Value++}");
-
-        else whereClause = string.Format(whereClauseTemplate, $" = @{parameterIndexer.Value++}");
-      }
+        whereClause = CombineEqualsWhereClauseForValue(whereClauseTemplate, parameterIndexer);
 
       else if (property.Name == "NotEquals")
-      {
-        if (value is DateTime)
-          whereClause = string.Format(whereClauseTemplate, $".Date != @{parameterIndexer.Value++}");
-
-        else whereClause = string.Format(whereClauseTemplate, $" != @{parameterIndexer.Value++}");
-      }
+        whereClause = CombineNotEqualsWhereClauseForValue(whereClauseTemplate, parameterIndexer);
 
       else if (property.Name == "From")
-        whereClause = string.Format(whereClauseTemplate, $" >= @{parameterIndexer.Value++}");
+        whereClause = CombineFromWhereClauseForValue(whereClauseTemplate, parameterIndexer);
 
       else if (property.Name == "To")
-        whereClause = string.Format(whereClauseTemplate, $" <= @{parameterIndexer.Value++}");
+        whereClause = CombineToWhereClauseForValue(whereClauseTemplate, parameterIndexer);
 
       else if (property.Name == "Contains")
-        whereClause = string.Format(whereClauseTemplate, $".Contains(@{parameterIndexer.Value++})");
+        whereClause = CombineContainsWhereClauseForValue(whereClauseTemplate, parameterIndexer);
 
-      else
-      {
-        if (whereClauseTemplate != "{0}")
-          whereClauseTemplate = string.Format(whereClauseTemplate, ".{0}");
+      else if (property.Name == "In")
+        whereClause = CombineInWhereClauseForValue(whereClauseTemplate, parameterIndexer);
 
-        whereClause = string.Format(whereClauseTemplate, $"{property.Name} = @{parameterIndexer.Value++}");
-      }
+      else whereClause = CombineDefaultWhereClauseForValue(whereClauseTemplate, parameterIndexer, property);
 
       whereClauses.Add(whereClause);
+    }
 
-      if (value is DateTime && (property.Name == "Equals" || property.Name == "NotEquals"))
-        parameters.Add(((DateTime)value).Date);
+    private static string CombineIsNullWhereClauseForValue(string whereClauseTemplate, Indexer parameterIndexer)
+    {
+      parameterIndexer.Value++;
+      return string.Format(whereClauseTemplate, $" = null");
+    }
 
-      else parameters.Add(value);
+    private static string CombineIsNotNullWhereClauseForValue(string whereClauseTemplate, Indexer parameterIndexer)
+    {
+      parameterIndexer.Value++;
+      return string.Format(whereClauseTemplate, $" != null");
+    }
+
+    private static string CombineEqualsWhereClauseForValue(string whereClauseTemplate, Indexer parameterIndexer)
+    {
+      return string.Format(whereClauseTemplate, $" = @{parameterIndexer.Value++}");
+    }
+
+    private static string CombineNotEqualsWhereClauseForValue(string whereClauseTemplate, Indexer parameterIndexer)
+    {
+      return string.Format(whereClauseTemplate, $" != @{parameterIndexer.Value++}");
+    }
+
+    private static string CombineFromWhereClauseForValue(string whereClauseTemplate, Indexer parameterIndexer)
+    {
+      return string.Format(whereClauseTemplate, $" >= @{parameterIndexer.Value++}");
+    }
+
+    private static string CombineToWhereClauseForValue(string whereClauseTemplate, Indexer parameterIndexer)
+    {
+      return string.Format(whereClauseTemplate, $" <= @{parameterIndexer.Value++}");
+    }
+
+    private static string CombineContainsWhereClauseForValue(string whereClauseTemplate, Indexer parameterIndexer)
+    {
+      return string.Format(whereClauseTemplate, $".Contains(@{parameterIndexer.Value++})");
+    }
+
+    private static string CombineInWhereClauseForValue(string whereClauseTemplate, Indexer parameterIndexer)
+    {
+      string lambdaOperator = " => ";
+      string temp;
+
+      if (whereClauseTemplate.Contains(lambdaOperator))
+      {
+        temp = whereClauseTemplate.Substring(
+          whereClauseTemplate.LastIndexOf(lambdaOperator) + lambdaOperator.Length
+        );
+
+        temp = temp.Remove(temp.IndexOf('}') + 1);
+      }
+
+      else temp = whereClauseTemplate;
+
+      return whereClauseTemplate.Replace(temp, $"@{parameterIndexer.Value++}.Contains({temp.Replace("{0}", string.Empty)})");
+    }
+
+    private static string CombineDefaultWhereClauseForValue(string whereClauseTemplate, Indexer parameterIndexer, PropertyInfo property)
+    {
+      if (whereClauseTemplate != "{0}")
+        whereClauseTemplate = string.Format(whereClauseTemplate, ".{0}");
+
+      return string.Format(whereClauseTemplate, $"{property.Name} = @{parameterIndexer.Value++}");
     }
 
     private static void CombineWhereClauseForFilter(string whereClauseTemplate, Indexer shortcutIndexer, Indexer parameterIndexer, List<string> whereClauses, List<object> parameters, PropertyInfo property, IFilter filter)
@@ -218,6 +261,40 @@ namespace Magicalizer.Data.Repositories.EntityFramework.Extensions
     private static bool IsFilter(PropertyInfo property)
     {
       return (typeof(IFilter).IsAssignableFrom(property.PropertyType));
+    }
+
+    private static object ProcessValue<TEntityFilter>(TEntityFilter filter, PropertyInfo property, object value)
+    {
+      if (property.Name != "In")
+        return value;
+
+      if (filter is ByteFilter)
+        return value is string ids ? ids.Split(',').Select(id => byte.Parse(id)).ToList() : Array.Empty<byte>();
+
+      if (filter is ShortFilter)
+        return value is string ids ? ids.Split(',').Select(id => short.Parse(id)).ToList() : Array.Empty<short>();
+
+      if (filter is IntegerFilter)
+        return value is string ids ? ids.Split(',').Select(id => int.Parse(id)).ToList() : Array.Empty<int>();
+
+      if (filter is LongFilter)
+        return value is string ids ? ids.Split(',').Select(id => long.Parse(id)).ToList() : Array.Empty<long>();
+
+      if (filter is DecimalFilter)
+        return value is string ids ? ids.Split(',').Select(id => decimal.Parse(id)).ToList() : Array.Empty<decimal>();
+
+      if (filter is FloatFilter)
+        return value is string ids ? ids.Split(',').Select(id => float.Parse(id)).ToList() : Array.Empty<float>();
+
+      if (filter is DoubleFilter)
+        return value is string ids ? ids.Split(',').Select(id => double.Parse(id)).ToList() : Array.Empty<double>();
+
+      if (filter is GuidFilter)
+        return value is string ids ? ids.Split(',').Select(id => Guid.Parse(id)).ToList() : Array.Empty<Guid>();
+
+      {
+        return value is string ids ? ids.Split(',').ToList() : new string[] { };
+      }
     }
 
     private static string ConvertSortingCriterion(string criterion)

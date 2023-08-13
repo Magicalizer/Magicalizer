@@ -34,6 +34,11 @@ namespace Magicalizer.Filters.Abstractions
     public string Contains { get; set; }
 
     /// <summary>
+    /// Determines if a property value should be in the given comma-separated range.
+    /// </summary>
+    public string In { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="StringFilter"/> class.
     /// </summary>
     public StringFilter() { }
@@ -47,13 +52,14 @@ namespace Magicalizer.Filters.Abstractions
     /// <param name="notEquals">Determines if a property value should not be equal to the given one.</param>
     /// <param name="from">Determines if a property value should be greater than the given one.</param>
     /// <param name="to">Determines if a property value should be less than the given one.</param>
-    public StringFilter(bool? isNull = null, bool? isNotNull = null, string equals = null, string notEquals = null, string contains = null)
+    public StringFilter(bool? isNull = null, bool? isNotNull = null, string equals = null, string notEquals = null, string contains = null, string @in = null)
     {
       this.IsNull = isNull;
       this.IsNotNull = isNotNull;
       this.Equals = equals;
       this.NotEquals = notEquals;
       this.Contains = contains;
+      this.In = @in;
     }
   }
 }

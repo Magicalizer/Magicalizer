@@ -1,13 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props"></Import>
 
   <PropertyGroup>
-    <Authors>Dmitry Sikorsky</Authors>
-    <Copyright>Copyright © 2020 Dmitry Sikorsky</Copyright>
     <TargetFramework>net7.0</TargetFramework>
-    <VersionPrefix>3.0.0</VersionPrefix>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://magicalizer.net/</PackageProjectUrl>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExtCore.Mvc" Version="8.0.0" />
-    <PackageReference Include="ExtCore.WebApplication" Version="8.0.0" />
+    <PackageReference Include="ExtCore.Mvc" Version="8.1.0" />
+    <PackageReference Include="ExtCore.WebApplication" Version="8.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.0" />
   </ItemGroup>
