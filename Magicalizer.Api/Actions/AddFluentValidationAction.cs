@@ -20,7 +20,7 @@ namespace Magicalizer.Api.Actions
       mvcBuilder.AddFluentValidation(fv => {
         fv.RegisterValidatorsFromAssemblies(ExtensionManager.Assemblies);
         fv.LocalizationEnabled = false;
-        fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+        fv.DisableDataAnnotationsValidation = true;
       });
     }
   }

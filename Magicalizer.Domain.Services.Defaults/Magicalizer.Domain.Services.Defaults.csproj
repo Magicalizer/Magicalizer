@@ -2,7 +2,7 @@
   <Import Project="..\common.props"></Import>
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExtCore.Infrastructure" Version="8.1.0" />
+    <PackageReference Include="ExtCore.Infrastructure" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
