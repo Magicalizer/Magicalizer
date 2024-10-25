@@ -5,8 +5,4 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="icon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
-
 </Project>

@@ -1,48 +1,32 @@
 ﻿// Copyright © 2020 Dmitry Sikorsky. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
+namespace Magicalizer.Api.Dto.Abstractions;
 
-namespace Magicalizer.Api.Dto.Abstractions
+/// <summary>
+/// Specifies authorization rules for a DTO's controller, validating against a specific policy and HTTP method.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class)]
+public class AuthorizationRuleAttribute : Attribute
 {
   /// <summary>
-  /// Defines the HTTP methods.
+  /// The authorization policy to validate against.
   /// </summary>
-  public enum HttpMethod
-  {
-    Any,
-    Get,
-    Post,
-    Put,
-    Patch,
-    Delete
-  }
+  public string PolicyName { get; }
 
   /// <summary>
-  /// Indicates to the Magicalizer to validate authorization policy before executing requests with the given HTTP method.
+  /// The HTTP method to which the policy applies.
   /// </summary>
-  [AttributeUsage(AttributeTargets.Class)]
-  public class AuthorizationRuleAttribute : Attribute
+  public HttpMethod HttpMethod { get; }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="AuthorizationRuleAttribute"/> class with the specified policy and HTTP method.
+  /// </summary>
+  /// <param name="policyName">The authorization policy to validate against.</param>
+  /// <param name="httpMethod">The HTTP method to which the policy applies. Defaults to <see cref="HttpMethod.Any"/>.</param>
+  public AuthorizationRuleAttribute(string policyName, HttpMethod httpMethod = HttpMethod.Any)
   {
-    /// <summary>
-    /// Name of the authorization policy to validate.
-    /// </summary>
-    public string PolicyName { get; }
-
-    /// <summary>
-    /// HTTP method the authorization policy validation should be applied to.
-    /// </summary>
-    public HttpMethod HttpMethod { get; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AuthorizationRuleAttribute"/> class.
-    /// </summary>
-    /// <param name="policyName">Name of the authorization policy to validate.</param>
-    /// <param name="httpMethod">HTTP method the authorization policy validation should be applied to.</param>
-    public AuthorizationRuleAttribute(string policyName, HttpMethod httpMethod = HttpMethod.Any)
-    {
-      this.HttpMethod = httpMethod;
-      this.PolicyName = policyName;
-    }
+    this.PolicyName = policyName;
+    this.HttpMethod = httpMethod;
   }
 }

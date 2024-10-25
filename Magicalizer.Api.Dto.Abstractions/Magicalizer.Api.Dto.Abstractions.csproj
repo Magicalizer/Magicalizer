@@ -1,13 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\common.props"></Import>
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="icon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Magicalizer.Domain.Models.Abstractions\Magicalizer.Domain.Models.Abstractions.csproj" />

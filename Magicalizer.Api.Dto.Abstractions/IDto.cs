@@ -3,25 +3,24 @@
 
 using Magicalizer.Domain.Models.Abstractions;
 
-namespace Magicalizer.Api.Dto.Abstractions
+namespace Magicalizer.Api.Dto.Abstractions;
+
+/// <summary>
+/// Base interface for a Data Transfer Object (DTO).
+/// </summary>
+public interface IDto
+{
+}
+
+/// <summary>
+/// Base interface for a DTO that can be mapped to a model.
+/// </summary>
+/// <typeparam name="TModel">The model type that this DTO maps to.</typeparam>
+public interface IDto<TModel> : IDto where TModel : class, IModel
 {
   /// <summary>
-  /// Describes a DTO.
+  /// Converts the DTO to its corresponding model.
   /// </summary>
-  public interface IDto
-  {
-  }
-
-  /// <summary>
-  /// Describes a DTO.
-  /// </summary>
-  /// <typeparam name="TModel">A model type this DTO is used for.</typeparam>
-  public interface IDto<TModel> : IDto where TModel : class, IModel
-  {
-    /// <summary>
-    /// Creates a model and maps current DTO on it.
-    /// </summary>
-    /// <returns></returns>
-    TModel ToModel();
-  }
+  /// <returns>The corresponding model.</returns>
+  TModel ToModel();
 }

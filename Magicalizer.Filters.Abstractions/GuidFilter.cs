@@ -1,59 +1,57 @@
 ﻿// Copyright © 2021 Dmitry Sikorsky. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
+namespace Magicalizer.Filters.Abstractions;
 
-namespace Magicalizer.Filters.Abstractions
+/// <summary>
+/// A filter for <see cref="Guid"/> properties, allowing for comparisons and null checks.
+/// </summary>
+public class GuidFilter : IFilter
 {
   /// <summary>
-  /// Represents a <see cref="Guid"/> filter.
+  /// Specifies if the property value should be null.
   /// </summary>
-  public class GuidFilter : IFilter
+  public bool? IsNull { get; set; }
+
+  /// <summary>
+  /// Specifies if the property value should be non-null.
+  /// </summary>
+  public bool? IsNotNull { get; set; }
+
+  /// <summary>
+  /// Specifies if the property value should be equal to the provided one.
+  /// </summary>
+  new public Guid? Equals { get; set; }
+
+  /// <summary>
+  /// Specifies if the property value should not be equal to the provided one.
+  /// </summary>
+  public Guid? NotEquals { get; set; }
+
+  /// <summary>
+  /// Specifies if the property value should be one of the provided comma-separated ones.
+  /// </summary>
+  public IEnumerable<Guid>? In { get; set; }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="GuidFilter"/> class.
+  /// </summary>
+  public GuidFilter() { }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="GuidFilter"/> class with specific conditions.
+  /// </summary>
+  /// <param name="isNull">If the property value should be null.</param>
+  /// <param name="isNotNull">If the property value should be non-null.</param>
+  /// <param name="equals">If the property value should be equal to the provided one.</param>
+  /// <param name="notEquals">If the property value should not be equal to the provided one.</param>
+  /// <param name="in">If the property value should be one of the provided comma-separated ones.</param>
+  public GuidFilter(bool? isNull = null, bool? isNotNull = null, Guid? equals = null, Guid? notEquals = null, IEnumerable<Guid>? @in = null)
   {
-    /// <summary>
-    /// Determines if a property value should be null.
-    /// </summary>
-    public bool? IsNull { get; set; }
-
-    /// <summary>
-    /// Determines if a property value should be non-null.
-    /// </summary>
-    public bool? IsNotNull { get; set; }
-
-    /// <summary>
-    /// Determines if a property value should be equal to the given one.
-    /// </summary>
-    new public Guid? Equals { get; set; }
-
-    /// <summary>
-    /// Determines if a property value should not be equal to the given one.
-    /// </summary>
-    public Guid? NotEquals { get; set; }
-
-    /// <summary>
-    /// Determines if a property value should be in the given comma-separated range.
-    /// </summary>
-    public string In { get; set; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GuidFilter"/> class.
-    /// </summary>
-    public GuidFilter() { }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GuidFilter"/> class.
-    /// </summary>
-    /// <param name="isNull">Determines if a property value should be null.</param>
-    /// <param name="isNotNull">Determines if a property value should be non-null.</param>
-    /// <param name="equals">Determines if a property value should be equal to the given one.</param>
-    /// <param name="notEquals">Determines if a property value should not be equal to the given one.</param>
-    public GuidFilter(bool? isNull = null, bool? isNotNull = null, Guid? equals = null, Guid? notEquals = null, string @in = null)
-    {
-      this.IsNull = isNull;
-      this.IsNotNull = isNotNull;
-      this.Equals = equals;
-      this.NotEquals = notEquals;
-      this.In = @in;
-    }
+    this.IsNull = isNull;
+    this.IsNotNull = isNotNull;
+    this.Equals = equals;
+    this.NotEquals = notEquals;
+    this.In = @in;
   }
 }

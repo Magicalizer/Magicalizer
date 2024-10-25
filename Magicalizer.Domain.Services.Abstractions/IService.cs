@@ -1,184 +1,121 @@
 ﻿// Copyright © 2020 Dmitry Sikorsky. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Magicalizer.Domain.Models.Abstractions;
 using Magicalizer.Filters.Abstractions;
 
-namespace Magicalizer.Domain.Services.Abstractions
+namespace Magicalizer.Domain.Services.Abstractions;
+
+/// <summary>
+/// A base service interface for managing models supporting CRUD, filtering, sorting, pagination, and inclusion.
+/// </summary>
+/// <typeparam name="TModel">The model type.</typeparam>
+/// <typeparam name="TFilter">The filter type.</typeparam>
+public interface IService<TModel, TFilter>
+  where TModel : class, IModel
+  where TFilter : class, IFilter
 {
   /// <summary>
-  /// Describes a service to manipulate the models.
+  /// Retrieves all the models with sorting, pagination, and inclusions.
   /// </summary>
-  /// <typeparam name="TKey">A model's unique identifier type.</typeparam>
-  /// <typeparam name="TModel">A model type.</typeparam>
-  /// <typeparam name="TFilter">A model filter type.</typeparam>
-  public interface IService<TKey, TModel, TFilter>
-    where TModel : class, IModel
-    where TFilter : class, IFilter
-  {
-    /// <summary>
-    /// Gets a model by identifier.
-    /// </summary>
-    /// <param name="id">A model's identifier.</param>
-    /// <param name="inclusions">Navigation property paths that should be loaded with the model.</param>
-    Task<TModel> GetByIdAsync(TKey id, params string[] inclusions);
-
-    /// <summary>
-    /// Gets the models.
-    /// </summary>
-    /// <param name="filter">A filter object to filter the models.</param>
-    /// <param name="sorting">
-    /// Comma-separated navigation property paths to sort the models by
-    /// (user "+" and "-" to specify sorting direction; example: "+category.name,-position").
-    /// </param>
-    /// <param name="offset">Number of the models that should be skipped.</param>
-    /// <param name="limit">Number of the models that should be returned.</param>
-    /// <param name="inclusions">Navigation property paths that should be loaded with the models.</param>
-    Task<IEnumerable<TModel>> GetAllAsync(TFilter filter = null, string sorting = null, int? offset = null, int? limit = null, params string[] inclusions);
-
-    /// <summary>
-    /// Gets number of the models.
-    /// </summary>
-    /// <param name="filter">A filter object to filter the models.</param>
-    Task<int> CountAsync(TFilter filter = null);
-
-    /// <summary>
-    /// Creates and returns a model.
-    /// </summary>
-    /// <param name="model">A model to create.</param>
-    Task<TModel> CreateAsync(TModel model);
-
-    /// <summary>
-    /// Edits a model.
-    /// </summary>
-    /// <param name="model">A model to edit.</param>
-    Task EditAsync(TModel model);
-
-    /// <summary>
-    /// Deletes a model.
-    /// </summary>
-    /// <param name="id">A model's identifier.</param>
-    Task<bool> DeleteAsync(TKey id);
-  }
+  /// <param name="sorting">The sorting property path with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
+  /// <param name="offset">The number of models to skip.</param>
+  /// <param name="limit">The maximum number of models to return.</param>
+  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <returns>The collection of all the models.</returns>
+  Task<IEnumerable<TModel>> GetAllAsync(string? sorting = null, int? offset = null, int? limit = null, params string[] inclusions);
 
   /// <summary>
-  /// Describes a service to manipulate the models.
+  /// Retrieves all the models with sorting, pagination, and inclusions.
   /// </summary>
-  /// <typeparam name="TKey1">The first model's unique identifier type.</typeparam>
-  /// <typeparam name="TKey2">The second model's unique identifier type.</typeparam>
-  /// <typeparam name="TModel">A model type.</typeparam>
-  /// <typeparam name="TFilter">A model filter type.</typeparam>
-  public interface IService<TKey1, TKey2, TModel, TFilter>
-    where TModel : class, IModel
-    where TFilter : class, IFilter
-  {
-    /// <summary>
-    /// Gets a model by identifiers.
-    /// </summary>
-    /// <param name="id1">The first model's identifier.</param>
-    /// <param name="id2">The second model's identifier.</param>
-    /// <param name="inclusions">Navigation property paths that should be loaded with the model.</param>
-    Task<TModel> GetByIdAsync(TKey1 id1, TKey2 id2, params string[] inclusions);
-
-    /// <summary>
-    /// Gets the models.
-    /// </summary>
-    /// <param name="filter">A filter object to filter the models.</param>
-    /// <param name="sorting">
-    /// Comma-separated navigation property paths to sort the models by
-    /// (user "+" and "-" to specify sorting direction; example: "+category.name,-position").
-    /// </param>
-    /// <param name="offset">Number of the models that should be skipped.</param>
-    /// <param name="limit">Number of the models that should be returned.</param>
-    /// <param name="inclusions">Navigation property paths that should be loaded with the models.</param>
-    Task<IEnumerable<TModel>> GetAllAsync(TFilter filter = null, string sorting = null, int? offset = null, int? limit = null, params string[] inclusions);
-
-    /// <summary>
-    /// Gets number of the models.
-    /// </summary>
-    /// <param name="filter">A filter object to filter the models.</param>
-    Task<int> CountAsync(TFilter filter = null);
-
-    /// <summary>
-    /// Creates a model.
-    /// </summary>
-    /// <param name="model">A model to create.</param>
-    Task<TModel> CreateAsync(TModel model);
-
-    /// <summary>
-    /// Edits a model.
-    /// </summary>
-    /// <param name="model">A model to edit.</param>
-    Task EditAsync(TModel model);
-
-    /// <summary>
-    /// Deletes a model.
-    /// </summary>
-    /// <param name="id1">The first model's identifier.</param>
-    /// <param name="id2">The second model's identifier.</param>
-    Task<bool> DeleteAsync(TKey1 id1, TKey2 id2);
-  }
+  /// <param name="sortings">The sorting property paths with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
+  /// <param name="offset">The number of models to skip.</param>
+  /// <param name="limit">The maximum number of models to return.</param>
+  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <returns>The collection of all the models.</returns>
+  Task<IEnumerable<TModel>> GetAllAsync(IEnumerable<string> sortings, int? offset = null, int? limit = null, params string[] inclusions);
 
   /// <summary>
-  /// Describes a service to manipulate the models.
+  /// Retrieves all the models with sorting, pagination, and inclusions.
   /// </summary>
-  /// <typeparam name="TKey1">The first model's unique identifier type.</typeparam>
-  /// <typeparam name="TKey2">The second model's unique identifier type.</typeparam>
-  /// <typeparam name="TKey3">The third model's unique identifier type.</typeparam>
-  /// <typeparam name="TModel">A model type.</typeparam>
-  /// <typeparam name="TFilter">A model filter type.</typeparam>
-  public interface IService<TKey1, TKey2, TKey3, TModel, TFilter>
-    where TModel : class, IModel
-    where TFilter : class, IFilter
-  {
-    /// <summary>
-    /// Gets a model by identifiers.
-    /// </summary>
-    /// <param name="id1">The first model's identifier.</param>
-    /// <param name="id2">The second model's identifier.</param>
-    /// <param name="id3">The third model's identifier.</param>
-    /// <param name="inclusions">Navigation property paths that should be loaded with the model.</param>
-    Task<TModel> GetByIdAsync(TKey1 id1, TKey2 id2, TKey3 id3, params string[] inclusions);
+  /// <param name="sorting">The sorting property paths with sorting direction.</param>
+  /// <param name="offset">The number of models to skip.</param>
+  /// <param name="limit">The maximum number of models to return.</param>
+  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <returns>The collection of all the models.</returns>
+  Task<IEnumerable<TModel>> GetAllAsync(ISorting<TModel> sorting, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
 
-    /// <summary>
-    /// Gets the models.
-    /// </summary>
-    /// <param name="filter">A filter object to filter the models.</param>
-    /// <param name="sorting">
-    /// Comma-separated navigation property paths to sort the models by
-    /// (user "+" and "-" to specify sorting direction; example: "+category.name,-position").
-    /// </param>
-    /// <param name="offset">Number of the models that should be skipped.</param>
-    /// <param name="limit">Number of the models that should be returned.</param>
-    /// <param name="inclusions">Navigation property paths that should be loaded with the models.</param>
-    Task<IEnumerable<TModel>> GetAllAsync(TFilter filter = null, string sorting = null, int? offset = null, int? limit = null, params string[] inclusions);
+  /// <summary>
+  /// Retrieves all the models with sorting, pagination, and inclusions.
+  /// </summary>
+  /// <param name="sortings">The sorting property paths with sorting direction.</param>
+  /// <param name="offset">The number of models to skip.</param>
+  /// <param name="limit">The maximum number of models to return.</param>
+  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <returns>The collection of all the models.</returns>
+  Task<IEnumerable<TModel>> GetAllAsync(IEnumerable<ISorting<TModel>> sortings, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
 
-    /// <summary>
-    /// Gets number of the models.
-    /// </summary>
-    /// <param name="filter">A filter object to filter the models.</param>
-    Task<int> CountAsync(TFilter filter = null);
+  /// <summary>
+  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
+  /// </summary>
+  /// <param name="filter">The filter to query models.</param>
+  /// <param name="sorting">The sorting property path with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
+  /// <param name="offset">The number of models to skip.</param>
+  /// <param name="limit">The maximum number of models to return.</param>
+  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <returns>The collection of models that match the filter.</returns>
+  Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, string? sorting = null, int? offset = null, int? limit = null, params string[] inclusions);
 
-    /// <summary>
-    /// Creates a model.
-    /// </summary>
-    /// <param name="model">A model to create.</param>
-    Task<TModel> CreateAsync(TModel model);
+  /// <summary>
+  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
+  /// </summary>
+  /// <param name="filter">The filter to query models.</param>
+  /// <param name="sortings">The sorting property paths with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
+  /// <param name="offset">The number of models to skip.</param>
+  /// <param name="limit">The maximum number of models to return.</param>
+  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <returns>The collection of models that match the filter.</returns>
+  Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, IEnumerable<string> sortings, int? offset = null, int? limit = null, params string[] inclusions);
 
-    /// <summary>
-    /// Edits a model.
-    /// </summary>
-    /// <param name="model">A model to edit.</param>
-    Task EditAsync(TModel model);
+  /// <summary>
+  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
+  /// </summary>
+  /// <param name="filter">The filter to query models.</param>
+  /// <param name="sorting">The sorting property paths with sorting direction.</param>
+  /// <param name="offset">The number of models to skip.</param>
+  /// <param name="limit">The maximum number of models to return.</param>
+  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <returns>The collection of models that match the filter.</returns>
+  Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, ISorting<TModel> sorting, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
 
-    /// <summary>
-    /// Deletes a model.
-    /// </summary>
-    /// <param name="id1">The first model's identifier.</param>
-    /// <param name="id2">The second model's identifier.</param>
-    /// <param name="id3">The third model's identifier.</param>
-    Task<bool> DeleteAsync(TKey1 id1, TKey2 id2, TKey3 id3);
-  }
+  /// <summary>
+  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
+  /// </summary>
+  /// <param name="filter">The filter to query models.</param>
+  /// <param name="sortings">The sorting property paths with sorting direction.</param>
+  /// <param name="offset">The number of models to skip.</param>
+  /// <param name="limit">The maximum number of models to return.</param>
+  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <returns>The collection of models that match the filter.</returns>
+  Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, IEnumerable<ISorting<TModel>> sortings, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
+
+  /// <summary>
+  /// Retrieves the total count of models that match the optional filter.
+  /// </summary>
+  /// <param name="filter">The filter to count models.</param>
+  /// <returns>The count of models that match the filter.</returns>
+  Task<int> CountAsync(TFilter? filter = null);
+
+  /// <summary>
+  /// Creates a new model and returns it.
+  /// </summary>
+  /// <param name="model">The model to create.</param>
+  /// <returns>The created model.</returns>
+  Task<TModel> CreateAsync(TModel model);
+
+  /// <summary>
+  /// Updates an existing model.
+  /// </summary>
+  /// <param name="model">The model to update.</param>
+  Task EditAsync(TModel model);
 }

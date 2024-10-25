@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props"></Import>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Magicalizer.Api.Dto.Abstractions\Magicalizer.Api.Dto.Abstractions.csproj" />
+    <ProjectReference Include="..\Magicalizer.Domain.Services.Abstractions\Magicalizer.Domain.Services.Abstractions.csproj" />
+    <ProjectReference Include="..\Magicalizer.Validators.Abstractions\Magicalizer.Validators.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
