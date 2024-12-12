@@ -3,13 +3,13 @@
 
 using FluentValidation.AspNetCore;
 using Magicalizer.Api.Dto.Abstractions;
+using Magicalizer.Domain;
 using Magicalizer.Domain.Models.Abstractions;
 using Magicalizer.Domain.Services.Abstractions;
 using Magicalizer.Extensions;
 using Magicalizer.Filters.Abstractions;
 using Magicalizer.Validators.Abstractions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,13 +53,12 @@ public class DefaultController<TKey1, TKey2, TKey3, TModel, TDto, TFilter> : Con
   [HttpGet("{id1}/{id2}/{id3}")]
   public virtual async Task<ActionResult<TDto>> GetAsync(TKey1 id1, TKey2 id2, TKey3 id3, string? fields = null)
   {
-    if (!this.ValidateHttpMethodSupport(Dto.Abstractions.HttpMethod.Get))
-      return this.StatusCode(StatusCodes.Status405MethodNotAllowed);
+    ActionResult? validationResult = await this.ValidateRequestAsync(Dto.Abstractions.HttpMethod.Get);
 
-    if (!await this.ValidateAuthorizationRulesAsync(Dto.Abstractions.HttpMethod.Get))
-      return this.Forbid();
+    if (validationResult != null)
+      return validationResult;
 
-    TDto? dto = this.ModelToDto(await this.service.GetByIdAsync(id1, id2, id3, fields.SplitByComma()));
+    TDto? dto = this.ModelToDto(await this.service.GetByIdAsync(id1, id2, id3, fields.SplitByComma().Select(f => new Inclusion<TModel>(f)).ToArray()));
 
     return dto == null ? this.NotFound() : dto;
   }
@@ -76,16 +75,15 @@ public class DefaultController<TKey1, TKey2, TKey3, TModel, TDto, TFilter> : Con
   [HttpGet]
   public virtual async Task<ActionResult<IEnumerable<TDto>>> GetAsync([FromQuery] TFilter? filter = default, string? sorting = null, int? offset = null, int? limit = null, string? fields = null)
   {
-    if (!this.ValidateHttpMethodSupport(Dto.Abstractions.HttpMethod.Get))
-      return this.StatusCode(StatusCodes.Status405MethodNotAllowed);
+    ActionResult? validationResult = await this.ValidateRequestAsync(Dto.Abstractions.HttpMethod.Get);
 
-    if (!await this.ValidateAuthorizationRulesAsync(Dto.Abstractions.HttpMethod.Get))
-      return this.Forbid();
+    if (validationResult != null)
+      return validationResult;
 
     if (!string.IsNullOrEmpty(sorting) && sorting.StartsWith(' '))
       sorting = "+" + sorting.Substring(1);
 
-    this.Response.Headers["Paging-Total-Number"] = (await this.service.CountAsync(filter)).ToString();
+    this.Response.Headers["Paging-Total-Count"] = (await this.service.CountAsync(filter)).ToString();
 
     if (offset != null)
       this.Response.Headers["Paging-Offset"] = offset.ToString();
@@ -93,9 +91,13 @@ public class DefaultController<TKey1, TKey2, TKey3, TModel, TDto, TFilter> : Con
     if (limit != null)
       this.Response.Headers["Paging-Limit"] = limit.ToString();
 
-    IEnumerable<TModel> models = filter == null
-      ? await this.service.GetAllAsync(sorting.SplitByComma(), offset, limit, fields.SplitByComma())
-      : await this.service.GetFilteredAsync(filter, sorting.SplitByComma(), offset, limit, fields.SplitByComma());
+    IEnumerable<TModel> models = await this.service.GetAllAsync(
+      filter,
+      sorting.SplitByComma().Select(Sorting<TModel>.Parse).ToList(),
+      offset,
+      limit,
+      fields.SplitByComma().Select(f => new Inclusion<TModel>(f)).ToArray()
+    );
 
     return models.Select(m => this.ModelToDto(m)!).ToList();
   }
@@ -108,11 +110,10 @@ public class DefaultController<TKey1, TKey2, TKey3, TModel, TDto, TFilter> : Con
   [HttpPost]
   public virtual async Task<ActionResult<TDto>> PostAsync([FromBody][CustomizeValidator(RuleSet = RuleSetName.DefaultCreate)] TDto dto)
   {
-    if (!this.ValidateHttpMethodSupport(Dto.Abstractions.HttpMethod.Post))
-      return this.StatusCode(StatusCodes.Status405MethodNotAllowed);
+    ActionResult? validationResult = await this.ValidateRequestAsync(Dto.Abstractions.HttpMethod.Post);
 
-    if (!await this.ValidateAuthorizationRulesAsync(Dto.Abstractions.HttpMethod.Post))
-      return this.Forbid();
+    if (validationResult != null)
+      return validationResult;
 
     if (!this.ModelState.IsValid)
       return this.BadRequest(this.ModelState);
@@ -131,11 +132,10 @@ public class DefaultController<TKey1, TKey2, TKey3, TModel, TDto, TFilter> : Con
   [HttpPut]
   public virtual async Task<IActionResult> PutAsync([FromBody][CustomizeValidator(RuleSet = RuleSetName.DefaultEdit)] TDto dto)
   {
-    if (!this.ValidateHttpMethodSupport(Dto.Abstractions.HttpMethod.Put))
-      return this.StatusCode(StatusCodes.Status405MethodNotAllowed);
+    ActionResult? validationResult = await this.ValidateRequestAsync(Dto.Abstractions.HttpMethod.Put);
 
-    if (!await this.ValidateAuthorizationRulesAsync(Dto.Abstractions.HttpMethod.Put))
-      return this.Forbid();
+    if (validationResult != null)
+      return validationResult;
 
     if (!this.ModelState.IsValid)
       return this.BadRequest(this.ModelState);
@@ -158,11 +158,10 @@ public class DefaultController<TKey1, TKey2, TKey3, TModel, TDto, TFilter> : Con
   [HttpPatch("{id1}/{id2}/{id3}")]
   public virtual async Task<IActionResult> PatchAsync(TKey1 id1, TKey2 id2, TKey3 id3, [FromBody] JsonPatchDocument<TDto> dtoPatch)
   {
-    if (!this.ValidateHttpMethodSupport(Dto.Abstractions.HttpMethod.Patch))
-      return this.StatusCode(StatusCodes.Status405MethodNotAllowed);
+    ActionResult? validationResult = await this.ValidateRequestAsync(Dto.Abstractions.HttpMethod.Patch);
 
-    if (!await this.ValidateAuthorizationRulesAsync(Dto.Abstractions.HttpMethod.Patch))
-      return this.Forbid();
+    if (validationResult != null)
+      return validationResult;
 
     TDto? dto = this.ModelToDto(await this.service.GetByIdAsync(id1, id2, id3));
 
@@ -185,11 +184,10 @@ public class DefaultController<TKey1, TKey2, TKey3, TModel, TDto, TFilter> : Con
   [HttpDelete("{id1}/{id2}/{id3}")]
   public virtual async Task<IActionResult> DeleteAsync(TKey1 id1, TKey2 id2, TKey3 id3)
   {
-    if (!this.ValidateHttpMethodSupport(Dto.Abstractions.HttpMethod.Delete))
-      return this.StatusCode(StatusCodes.Status405MethodNotAllowed);
+    ActionResult? validationResult = await this.ValidateRequestAsync(Dto.Abstractions.HttpMethod.Delete);
 
-    if (!(await this.ValidateAuthorizationRulesAsync(Dto.Abstractions.HttpMethod.Delete)))
-      return this.Forbid();
+    if (validationResult != null)
+      return validationResult;
 
     await this.service.DeleteAsync(id1, id2, id3);
     return this.NoContent();

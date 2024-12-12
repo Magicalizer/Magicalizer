@@ -7,34 +7,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Magicalizer.Data.Extensions;
 
 /// <summary>
-/// Provides extension methods for applying navigation property inclusions to queries.
+/// Provides extension method for applying navigation property inclusions to queries.
 /// </summary>
 public static class InclusionsQueryableExtensions
 {
-  /// <summary>
-  /// Applies inclusions to the queryable result using a collection of property path strings.
-  /// </summary>
-  /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
-  /// <param name="result">The queryable entity set to apply the inclusions to.</param>
-  /// <param name="inclusions">A collection of property path strings for related entities to include.</param>
-  /// <returns>The modified queryable with the applied inclusions.</returns>
-  public static IQueryable<TEntity> ApplyInclusions<TEntity>(this IQueryable<TEntity> result, IEnumerable<string> inclusions)
-    where TEntity : class, IEntity
-  {
-    if (!inclusions.Any()) return result;
-
-    foreach (string inclusion in inclusions)
-    {
-      string fixedInclusion = PropertyPathFixer.FixPropertyPath<TEntity>(inclusion);
-
-      if (fixedInclusion.Length != 0)
-        result = result.Include(fixedInclusion);
-    }
-      
-
-    return result;
-  }
-
   /// <summary>
   /// Applies inclusions to the queryable result using a collection of <see cref="Inclusion{TEntity}"/> objects.
   /// </summary>

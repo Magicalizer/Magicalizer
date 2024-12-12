@@ -4,7 +4,6 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Magicalizer.Api;
-using Magicalizer.Api.Dto.Abstractions;
 using Magicalizer.Data.Entities.Abstractions;
 using Magicalizer.Domain.Models.Abstractions;
 using Magicalizer.Domain.Services;
@@ -44,60 +43,60 @@ public static class ServiceCollectionExtensions
 
   private static void AddDomainServices(IServiceCollection services)
   {
-    foreach (Type dtoType in typeof(IDto).GetImplementations())
+    foreach (Type modelType in typeof(IModel).GetImplementations())
     {
-      Type? modelType = dtoType.GetGenericInterfaceTypeParameter(typeof(IDto<>), typeof(IModel));
-      Type? entityType = modelType?.GetGenericInterfaceTypeParameter(typeof(IModel<,>), typeof(IEntity));
-      Type? filterType = modelType?.GetGenericInterfaceTypeParameter(typeof(IModel<,>), typeof(IFilter));
+      Type? entityType = modelType.GetGenericInterfaceTypeParameter(typeof(IModel<,>), typeof(IEntity));
+      Type? filterType = modelType.GetGenericInterfaceTypeParameter(typeof(IModel<,>), typeof(IFilter));
 
       if (modelType == null || entityType == null || filterType == null) continue;
 
       if (entityType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntity<>)))
       {
-        IEnumerable<Type>? keyTypes = entityType.GetGenericInterfaceTypeParameters(typeof(IEntity<>));
+        Type[] keyTypes = GetKeyTypes(entityType);
 
-        if (keyTypes?.Count() == 1)
-        {
-          Type? keyType = keyTypes.First();
-          Type? genericServiceType = typeof(IService<,,>).MakeGenericType(keyType, modelType, filterType);
-          Type? genericServiceImplementationType = typeof(Service<,,,>).MakeGenericType(keyType, entityType, modelType, filterType);
-          Type? serviceImplementationType = genericServiceType.GetImplementations().FirstOrDefault();
+        if (keyTypes.Length == 0) continue;
 
-          if (serviceImplementationType == null)
-            services.AddScoped(genericServiceType, genericServiceImplementationType);
-
-          else services.AddScoped(genericServiceType, serviceImplementationType);
-        }
-
-        else if (keyTypes?.Count() == 2)
-        {
-          Type? key1Type = keyTypes.First();
-          Type? key2Type = keyTypes.Last();
-          Type? genericServiceType = typeof(IService<,,,>).MakeGenericType(key1Type, key2Type, modelType, filterType);
-          Type? genericServiceImplementationType = typeof(Service<,,,,>).MakeGenericType(key1Type, key2Type, entityType, modelType, filterType);
-          Type? serviceImplementationType = genericServiceType.GetImplementations().FirstOrDefault();
-
-          if (serviceImplementationType == null)
-            services.AddScoped(genericServiceType, genericServiceImplementationType);
-
-          else services.AddScoped(genericServiceType, serviceImplementationType);
-        }
-
-        else if (keyTypes?.Count() == 3)
-        {
-          Type? key1Type = keyTypes.ElementAt(0);
-          Type? key2Type = keyTypes.ElementAt(1);
-          Type? key3Type = keyTypes.ElementAt(2);
-          Type? genericServiceType = typeof(IService<,,,,>).MakeGenericType(key1Type, key2Type, key3Type, modelType, filterType);
-          Type? genericServiceImplementationType = typeof(Service<,,,,,>).MakeGenericType(key1Type, key2Type, key3Type, entityType, modelType, filterType);
-          Type? serviceImplementationType = genericServiceType.GetImplementations().FirstOrDefault();
-
-          if (serviceImplementationType == null)
-            services.AddScoped(genericServiceType, genericServiceImplementationType);
-
-          else services.AddScoped(genericServiceType, serviceImplementationType);
-        }
+        RegisterDomainService(services, keyTypes, entityType, modelType, filterType);
       }
     }
+  }
+
+  private static Type[] GetKeyTypes(Type entityType)
+  {
+    return entityType.GetInterfaces().FirstOrDefault(
+      i => i.IsGenericType &&
+        (i.GetGenericTypeDefinition() == typeof(IEntity<>) || i.GetGenericTypeDefinition() == typeof(IEntity<,>) || i.GetGenericTypeDefinition() == typeof(IEntity<,,>))
+    )?.GetGenericArguments() ?? [];
+  }
+
+  private static void RegisterDomainService(IServiceCollection services, Type[] keyTypes, Type entityType, Type modelType, Type filterType)
+  {
+    Type genericServiceType;
+    Type genericServiceImplementationType;
+
+    switch (keyTypes.Length)
+    {
+      case 1:
+        genericServiceType = typeof(IService<,,>).MakeGenericType(keyTypes[0], modelType, filterType);
+        genericServiceImplementationType = typeof(Service<,,,>).MakeGenericType(keyTypes[0], entityType, modelType, filterType);
+        break;
+
+      case 2:
+        genericServiceType = typeof(IService<,,,>).MakeGenericType(keyTypes[0], keyTypes[1], modelType, filterType);
+        genericServiceImplementationType = typeof(Service<,,,,>).MakeGenericType(keyTypes[0], keyTypes[1], entityType, modelType, filterType);
+        break;
+
+      case 3:
+        genericServiceType = typeof(IService<,,,,>).MakeGenericType(keyTypes[0], keyTypes[1], keyTypes[2], modelType, filterType);
+        genericServiceImplementationType = typeof(Service<,,,,,>).MakeGenericType(keyTypes[0], keyTypes[1], keyTypes[2], entityType, modelType, filterType);
+        break;
+
+      default:
+        return;
+    }
+
+    Type? serviceImplementationType = genericServiceType.GetImplementations().FirstOrDefault();
+
+    services.AddScoped(genericServiceType, serviceImplementationType ?? genericServiceImplementationType);
   }
 }

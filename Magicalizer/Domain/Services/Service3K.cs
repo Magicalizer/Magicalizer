@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Reflection;
-using FluentValidation;
 using Magicalizer.Data.Entities.Abstractions;
 using Magicalizer.Data.Extensions;
 using Magicalizer.Domain.Models.Abstractions;
@@ -31,48 +30,8 @@ public class Service<TKey1, TKey2, TKey3, TEntity, TModel, TFilter> : ServiceBas
   /// Initializes a new instance of the <see cref="Service{TKey1, TKey2, TKey3, TEntity, TModel, TFilter}"/> class.
   /// </summary>
   /// <param name="dbContext">The database context.</param>
-  /// <param name="validator">The optional model validator.</param>
-  public Service(DbContext dbContext, IValidator<TModel>? validator) : base(dbContext, validator) { }
-
-  /// <summary>
-  /// Retrieves a model by its composite primary key.
-  /// </summary>
-  /// <param name="id1">The value of the first property in the composite primary key.</param>
-  /// <param name="id2">The value of the second property in the composite primary key.</param>
-  /// <param name="id3">The value of the third property in the composite primary key.</param>
-  /// <returns>The model with the specified composite primary key, or <c>null</c> if no such model exists.</returns>
-  public virtual async Task<TModel?> GetByIdAsync(TKey1 id1, TKey2 id2, TKey3 id3)
-  {
-    return await this.GetByIdAsync(id1, id2, id3, Array.Empty<string>());
-  }
-
-  /// <summary>
-  /// Retrieves a model by its composite primary key.
-  /// </summary>
-  /// <param name="id1">The value of the first property in the composite primary key.</param>
-  /// <param name="id2">The value of the second property in the composite primary key.</param>
-  /// <param name="id3">The value of the third property in the composite primary key.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The model with the specified composite primary key, or <c>null</c> if no such model exists.</returns>
-  public virtual async Task<TModel?> GetByIdAsync(TKey1 id1, TKey2 id2, TKey3 id3, params string[] inclusions)
-  {
-    Microsoft.EntityFrameworkCore.Metadata.IProperty? key1 = GetPrimaryKeyProperty(0);
-    Microsoft.EntityFrameworkCore.Metadata.IProperty? key2 = GetPrimaryKeyProperty(1);
-    Microsoft.EntityFrameworkCore.Metadata.IProperty? key3 = GetPrimaryKeyProperty(2);
-
-    if (key1 == null || key2 == null || key3 == null) return null;
-
-    TEntity? entity = await dbContext.Set<TEntity>()
-      .AsNoTracking()
-      .ApplyInclusions(inclusions)
-      .FirstOrDefaultAsync(
-        e => EF.Property<TKey1>(e, key1.Name)!.Equals(id1) &&
-             EF.Property<TKey2>(e, key2.Name)!.Equals(id2) &&
-             EF.Property<TKey3>(e, key3.Name)!.Equals(id3)
-      );
-
-    return this.EntityToModel(entity);
-  }
+  /// <param name="serviceProvider">The service provider to get optional model validator.</param>
+  public Service(DbContext dbContext, IServiceProvider serviceProvider) : base(dbContext, serviceProvider) { }
 
   /// <summary>
   /// Retrieves a model by its composite primary key.

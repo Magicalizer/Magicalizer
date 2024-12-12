@@ -16,79 +16,6 @@ public interface IService<TModel, TFilter>
   where TFilter : class, IFilter
 {
   /// <summary>
-  /// Retrieves all the models with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="sorting">The sorting property path with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of all the models.</returns>
-  Task<IEnumerable<TModel>> GetAllAsync(string? sorting = null, int? offset = null, int? limit = null, params string[] inclusions);
-
-  /// <summary>
-  /// Retrieves all the models with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="sortings">The sorting property paths with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of all the models.</returns>
-  Task<IEnumerable<TModel>> GetAllAsync(IEnumerable<string> sortings, int? offset = null, int? limit = null, params string[] inclusions);
-
-  /// <summary>
-  /// Retrieves all the models with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="sorting">The sorting property paths with sorting direction.</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of all the models.</returns>
-  Task<IEnumerable<TModel>> GetAllAsync(ISorting<TModel> sorting, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
-
-  /// <summary>
-  /// Retrieves all the models with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="sortings">The sorting property paths with sorting direction.</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of all the models.</returns>
-  Task<IEnumerable<TModel>> GetAllAsync(IEnumerable<ISorting<TModel>> sortings, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
-
-  /// <summary>
-  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="filter">The filter to query models.</param>
-  /// <param name="sorting">The sorting property path with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of models that match the filter.</returns>
-  Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, string? sorting = null, int? offset = null, int? limit = null, params string[] inclusions);
-
-  /// <summary>
-  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="filter">The filter to query models.</param>
-  /// <param name="sortings">The sorting property paths with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of models that match the filter.</returns>
-  Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, IEnumerable<string> sortings, int? offset = null, int? limit = null, params string[] inclusions);
-
-  /// <summary>
-  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="filter">The filter to query models.</param>
-  /// <param name="sorting">The sorting property paths with sorting direction.</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of models that match the filter.</returns>
-  Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, ISorting<TModel> sorting, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
-
-  /// <summary>
   /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
   /// </summary>
   /// <param name="filter">The filter to query models.</param>
@@ -97,7 +24,7 @@ public interface IService<TModel, TFilter>
   /// <param name="limit">The maximum number of models to return.</param>
   /// <param name="inclusions">The inclusion property paths to include related models.</param>
   /// <returns>The collection of models that match the filter.</returns>
-  Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, IEnumerable<ISorting<TModel>> sortings, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
+  Task<IEnumerable<TModel>> GetAllAsync(TFilter? filter = null, IEnumerable<ISorting<TModel>>? sortings = null, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
 
   /// <summary>
   /// Retrieves the total count of models that match the optional filter.

@@ -21,21 +21,6 @@ public interface IService<TKey, TModel, TFilter> : IService<TModel, TFilter>
   /// Retrieves a model by its primary key.
   /// </summary>
   /// <param name="id">The value of the primary key.</param>
-  /// <returns>The model with the specified primary key, or <c>null</c> if no such model exists.</returns>
-  Task<TModel?> GetByIdAsync(TKey id);
-
-  /// <summary>
-  /// Retrieves a model by its primary key.
-  /// </summary>
-  /// <param name="id">The value of the primary key.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The model with the specified primary key, or <c>null</c> if no such model exists.</returns>
-  Task<TModel?> GetByIdAsync(TKey id, params string[] inclusions);
-
-  /// <summary>
-  /// Retrieves a model by its primary key.
-  /// </summary>
-  /// <param name="id">The value of the primary key.</param>
   /// <param name="inclusions">The inclusion property paths to include related models.</param>
   /// <returns>The model with the specified primary key, or <c>null</c> if no such model exists.</returns>
   Task<TModel?> GetByIdAsync(TKey id, params IInclusion<TModel>[] inclusions);

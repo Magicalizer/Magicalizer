@@ -25,25 +25,6 @@ public interface IService<TKey1, TKey2, TKey3, TModel, TFilter> : IService<TMode
   /// <param name="id1">The value of the first property in the composite primary key.</param>
   /// <param name="id2">The value of the second property in the composite primary key.</param>
   /// <param name="id3">The value of the third property in the composite primary key.</param>
-  /// <returns>The model with the specified composite primary key, or <c>null</c> if no such model exists.</returns>
-  Task<TModel?> GetByIdAsync(TKey1 id1, TKey2 id2, TKey3 id3);
-
-  /// <summary>
-  /// Retrieves a model by its composite primary key.
-  /// </summary>
-  /// <param name="id1">The value of the first property in the composite primary key.</param>
-  /// <param name="id2">The value of the second property in the composite primary key.</param>
-  /// <param name="id3">The value of the third property in the composite primary key.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The model with the specified composite primary key, or <c>null</c> if no such model exists.</returns>
-  Task<TModel?> GetByIdAsync(TKey1 id1, TKey2 id2, TKey3 id3, params string[] inclusions);
-
-  /// <summary>
-  /// Retrieves a model by its composite primary key.
-  /// </summary>
-  /// <param name="id1">The value of the first property in the composite primary key.</param>
-  /// <param name="id2">The value of the second property in the composite primary key.</param>
-  /// <param name="id3">The value of the third property in the composite primary key.</param>
   /// <param name="inclusions">The inclusion property paths to include related models.</param>
   /// <returns>The model with the specified composite primary key, or <c>null</c> if no such model exists.</returns>
   Task<TModel?> GetByIdAsync(TKey1 id1, TKey2 id2, TKey3 id3, params IInclusion<TModel>[] inclusions);

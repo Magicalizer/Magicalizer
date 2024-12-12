@@ -2,11 +2,11 @@
   <Import Project="..\common.props"></Import>
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="FluentValidation" Version="11.10.0" />
   </ItemGroup>
 
 </Project>

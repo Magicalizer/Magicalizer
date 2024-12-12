@@ -6,6 +6,7 @@ using Magicalizer.Api.Dto.Abstractions;
 using Magicalizer.Domain.Models.Abstractions;
 using Magicalizer.Filters.Abstractions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Magicalizer.Api.Controllers;
@@ -33,6 +34,25 @@ public abstract class ControllerBase<TModel, TDto, TFilter> : Controller
   }
 
   /// <summary>
+  /// Validates the HTTP method, authentication, and authorization for the specified HTTP method.
+  /// </summary>
+  /// <param name="httpMethod">The HTTP method to validate.</param>
+  /// <returns>A <see cref="IActionResult"/> indicating the result of the validation. Returns <c>null</c> if all validations pass.</returns>
+  protected virtual async Task<ActionResult?> ValidateRequestAsync(Dto.Abstractions.HttpMethod httpMethod)
+  {
+    if (!this.ValidateHttpMethodSupport(httpMethod))
+      return this.StatusCode(StatusCodes.Status405MethodNotAllowed);
+
+    if (!this.ValidateAuthentication(httpMethod))
+      return this.Unauthorized();
+
+    if (!await this.ValidateAuthorizationAsync(httpMethod))
+      return this.Forbid();
+
+    return null;
+  }
+
+  /// <summary>
   /// Checks if the current HTTP method is supported for the given DTO.
   /// </summary>
   /// <param name="httpMethod">The HTTP method to validate.</param>
@@ -47,13 +67,28 @@ public abstract class ControllerBase<TModel, TDto, TFilter> : Controller
   }
 
   /// <summary>
+  /// Validates that the user is authenticated for the specified HTTP method.
+  /// </summary>
+  /// <param name="httpMethod">The HTTP method to validate.</param>
+  /// <returns><c>true</c> if the user is authenticated; otherwise, <c>false</c>.</returns>
+  protected virtual bool ValidateAuthentication(Dto.Abstractions.HttpMethod httpMethod)
+  {
+    foreach (AuthenticatedOnlyAttribute authenticationRuleAttribute in typeof(TDto).GetCustomAttributes<AuthenticatedOnlyAttribute>())
+      if (authenticationRuleAttribute.HttpMethod == Dto.Abstractions.HttpMethod.Any || authenticationRuleAttribute.HttpMethod == httpMethod)
+        if (this?.User.Identity?.IsAuthenticated != true)
+          return false;
+
+    return true;
+  }
+
+  /// <summary>
   /// Validates the authorization rules for the specified HTTP method.
   /// </summary>
   /// <param name="httpMethod">The HTTP method to validate.</param>
   /// <returns><c>true</c> if the user is authorized; otherwise, <c>false</c>.</returns>
-  protected virtual async Task<bool> ValidateAuthorizationRulesAsync(Dto.Abstractions.HttpMethod httpMethod)
+  protected virtual async Task<bool> ValidateAuthorizationAsync(Dto.Abstractions.HttpMethod httpMethod)
   {
-    foreach (AuthorizationRuleAttribute authorizationRuleAttribute in typeof(TDto).GetCustomAttributes<AuthorizationRuleAttribute>())
+    foreach (AuthorizedOnlyAttribute authorizationRuleAttribute in typeof(TDto).GetCustomAttributes<AuthorizedOnlyAttribute>())
     {
       if (authorizationRuleAttribute.HttpMethod == Dto.Abstractions.HttpMethod.Any || authorizationRuleAttribute.HttpMethod == httpMethod)
       {

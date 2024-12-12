@@ -9,6 +9,7 @@ using Magicalizer.Domain.Models.Abstractions;
 using Magicalizer.Domain.Services.Abstractions;
 using Magicalizer.Filters.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Magicalizer.Domain.Services;
 
@@ -30,121 +31,11 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   /// Initializes a new instance of the <see cref="ServiceBase{TKey, TEntity, TModel, TFilter}"/> class.
   /// </summary>
   /// <param name="dbContext">The database context.</param>
-  /// <param name="validator">The optional model validator.</param>
-  public ServiceBase(DbContext dbContext, IValidator<TModel>? validator)
+  /// <param name="serviceProvider">The service provider to get optional model validator.</param>
+  public ServiceBase(DbContext dbContext, IServiceProvider serviceProvider)
   {
     this.dbContext = dbContext;
-    this.validator = validator;
-  }
-
-  /// <summary>
-  /// Retrieves all the models with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="sorting">The sorting property path with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of all the models.</returns>
-  public virtual async Task<IEnumerable<TModel>> GetAllAsync(string? sorting = null, int? offset = null, int? limit = null, params string[] inclusions)
-  {
-    return await this.GetAllAsync(sorting == null ? [] : [sorting!], offset, limit, inclusions);
-  }
-
-  /// <summary>
-  /// Retrieves all the models with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="sortings">The sorting property paths with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of all the models.</returns>
-  public virtual async Task<IEnumerable<TModel>> GetAllAsync(IEnumerable<string> sortings, int? offset = null, int? limit = null, params string[] inclusions)
-  {
-    return (await dbContext.Set<TEntity>()
-      .AsNoTracking()
-      .ApplySorting(inclusions)
-      .ApplyPaging(offset, limit)
-      .ApplyInclusions(inclusions)
-      .ToListAsync()).Select(e => EntityToModel(e)!);
-  }
-
-  /// <summary>
-  /// Retrieves all the models with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="sorting">The sorting property paths with sorting direction.</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of all the models.</returns>
-  public virtual async Task<IEnumerable<TModel>> GetAllAsync(ISorting<TModel> sorting, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions)
-  {
-    return await this.GetAllAsync([sorting], offset, limit, inclusions);
-  }
-
-  /// <summary>
-  /// Retrieves all the models with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="sortings">The sorting property paths with sorting direction.</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of all the models.</returns>
-  public virtual async Task<IEnumerable<TModel>> GetAllAsync(IEnumerable<ISorting<TModel>> sortings, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions)
-  {
-    return (await dbContext.Set<TEntity>()
-      .AsNoTracking()
-      .ApplySorting(sortings.Select(s => new Data.Sorting<TEntity>(s.IsAscending, s.PropertyPath)))
-      .ApplyPaging(offset, limit)
-      .ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)))
-      .ToListAsync()).Select(e => EntityToModel(e)!);
-  }
-
-  /// <summary>
-  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="filter">The filter to query models.</param>
-  /// <param name="sorting">The sorting property path with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of models that match the filter.</returns>
-  public virtual async Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, string? sorting = null, int? offset = null, int? limit = null, params string[] inclusions)
-  {
-    return await this.GetFilteredAsync(filter, sorting == null ? [] : [sorting!], offset, limit, inclusions);
-  }
-
-  /// <summary>
-  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="filter">The filter to query models.</param>
-  /// <param name="sortings">The sorting property paths with a "+" for ascending or "-" for descending (e.g., "+category.name", "-created").</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of models that match the filter.</returns>
-  public virtual async Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, IEnumerable<string> sortings, int? offset = null, int? limit = null, params string[] inclusions)
-  {
-    return (await dbContext.Set<TEntity>()
-      .AsNoTracking()
-      .ApplyFiltering(filter)
-      .ApplySorting(sortings)
-      .ApplyPaging(offset, limit)
-      .ApplyInclusions(inclusions)
-      .ToListAsync()).Select(e => EntityToModel(e)!);
-  }
-
-  /// <summary>
-  /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
-  /// </summary>
-  /// <param name="filter">The filter to query models.</param>
-  /// <param name="sorting">The sorting property paths with sorting direction.</param>
-  /// <param name="offset">The number of models to skip.</param>
-  /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The collection of models that match the filter.</returns>
-  public virtual async Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, ISorting<TModel> sorting, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions)
-  {
-    return await this.GetFilteredAsync(filter, [sorting], offset, limit, inclusions);
+    this.validator = serviceProvider.GetService<IValidator<TModel>>();
   }
 
   /// <summary>
@@ -156,15 +47,21 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   /// <param name="limit">The maximum number of models to return.</param>
   /// <param name="inclusions">The inclusion property paths to include related models.</param>
   /// <returns>The collection of models that match the filter.</returns>
-  public virtual async Task<IEnumerable<TModel>> GetFilteredAsync(TFilter filter, IEnumerable<ISorting<TModel>> sortings, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions)
+  public virtual async Task<IEnumerable<TModel>> GetAllAsync(TFilter? filter = null, IEnumerable<ISorting<TModel>>? sortings = null, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions)
   {
-    return (await dbContext.Set<TEntity>()
-      .AsNoTracking()
-      .ApplyFiltering(filter)
-      .ApplySorting(sortings.Select(s => new Data.Sorting<TEntity>(s.IsAscending, s.PropertyPath)))
-      .ApplyPaging(offset, limit)
-      .ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)))
-      .ToListAsync()).Select(e => EntityToModel(e)!);
+    IQueryable<TEntity> result = dbContext.Set<TEntity>().AsNoTracking();
+
+    if (filter != null)
+      result = result.ApplyFiltering(filter);
+
+    if (sortings != null)
+      result = result.ApplySorting(sortings.Select(s => new Data.Sorting<TEntity>(s.IsAscending, s.PropertyPath)));
+
+    if (offset != null || limit != null)
+      result = result.ApplyPaging(offset, limit);
+
+    result = result.ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)));
+    return (await result.ToListAsync()).Select(e => EntityToModel(e)!);
   }
 
   /// <summary>
@@ -174,10 +71,12 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   /// <returns>The count of models that match the filter.</returns>
   public virtual async Task<int> CountAsync(TFilter? filter = null)
   {
-    return await dbContext.Set<TEntity>()
-      .AsNoTracking()
-      .ApplyFiltering(filter)
-      .CountAsync();
+    IQueryable<TEntity> result = dbContext.Set<TEntity>().AsNoTracking();
+
+    if (filter != null)
+      result = result.ApplyFiltering(filter);
+
+    return await result.CountAsync();
   }
 
   /// <summary>
@@ -189,11 +88,11 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   {
     this.validator?.ValidateAndThrow(model);
 
-    TEntity entity = (model as IModel<TEntity>).ToEntity();
+    TEntity entity = (model as IModel<TEntity>)!.ToEntity();
 
     dbContext.Add(entity);
     await dbContext.SaveChangesAsync();
-    return this.EntityToModel(entity);
+    return this.EntityToModel(entity)!;
   }
 
   /// <summary>
@@ -204,7 +103,7 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   {
     this.validator?.ValidateAndThrow(model);
 
-    TEntity entity = (model as IModel<TEntity>).ToEntity();
+    TEntity entity = (model as IModel<TEntity>)!.ToEntity();
     Microsoft.EntityFrameworkCore.Metadata.IProperty? key = GetPrimaryKeyProperty(0);
 
     if (key == null) return;

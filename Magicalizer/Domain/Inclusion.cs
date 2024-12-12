@@ -3,6 +3,7 @@
 
 using System.Linq.Expressions;
 using Magicalizer.Domain.Models.Abstractions;
+using Magicalizer.Domain.Services.Abstractions;
 using Magicalizer.Extensions;
 
 namespace Magicalizer.Domain;
@@ -11,7 +12,7 @@ namespace Magicalizer.Domain;
 /// Represents an inclusion rule, defining a property path for related models.
 /// </summary>
 /// <typeparam name="TModel">The model type.</typeparam>
-public class Inclusion<TModel> where TModel : class, IModel
+public class Inclusion<TModel> : IInclusion<TModel> where TModel : class, IModel
 {
   /// <summary>
   /// The property path for including related models (e.g., "Category.Products").

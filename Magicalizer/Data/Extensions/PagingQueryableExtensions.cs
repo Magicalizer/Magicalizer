@@ -6,7 +6,7 @@ using Magicalizer.Data.Entities.Abstractions;
 namespace Magicalizer.Data.Extensions;
 
 /// <summary>
-/// Provides extension methods for applying pagination to queries.
+/// Provides extension method for applying pagination to queries.
 /// </summary>
 public static class PagingQueryableExtensions
 {
@@ -20,8 +20,11 @@ public static class PagingQueryableExtensions
   /// <returns>The modified queryable with the applied pagination.</returns>
   public static IQueryable<TEntity> ApplyPaging<TEntity>(this IQueryable<TEntity> result, int? offset, int? limit) where TEntity : class, IEntity
   {
-    if (offset != null && limit != null)
-      return result.Skip((int)offset).Take((int)limit);
+    if (offset != null)
+      result = result.Skip((int)offset);
+
+    if (limit != null)
+      result = result.Take((int)limit);
 
     return result;
   }

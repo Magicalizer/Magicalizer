@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Reflection;
-using FluentValidation;
 using Magicalizer.Data.Entities.Abstractions;
 using Magicalizer.Data.Extensions;
 using Magicalizer.Domain.Models.Abstractions;
@@ -28,38 +27,8 @@ where TFilter : class, IFilter
   /// Initializes a new instance of the <see cref="Service{TKey, TEntity, TModel, TFilter}"/> class.
   /// </summary>
   /// <param name="dbContext">The database context.</param>
-  /// <param name="validator">The optional model validator.</param>
-  public Service(DbContext dbContext, IValidator<TModel>? validator) : base(dbContext, validator) { }
-
-  /// <summary>
-  /// Retrieves a model by its primary key.
-  /// </summary>
-  /// <param name="id">The value of the primary key.</param>
-  /// <returns>The model with the specified primary key, or <c>null</c> if no such model exists.</returns>
-  public virtual async Task<TModel?> GetByIdAsync(TKey id)
-  {
-    return await this.GetByIdAsync(id, Array.Empty<string>());
-  }
-
-  /// <summary>
-  /// Retrieves a model by its primary key.
-  /// </summary>
-  /// <param name="id">The value of the primary key.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
-  /// <returns>The model with the specified primary key, or <c>null</c> if no such model exists.</returns>
-  public virtual async Task<TModel?> GetByIdAsync(TKey id, params string[] inclusions)
-  {
-    Microsoft.EntityFrameworkCore.Metadata.IProperty? key = GetPrimaryKeyProperty(0);
-
-    if (key == null) return null;
-
-    TEntity? entity = await dbContext.Set<TEntity>()
-      .AsNoTracking()
-      .ApplyInclusions(inclusions)
-      .FirstOrDefaultAsync(e => EF.Property<TKey>(e, key.Name)!.Equals(id));
-
-    return this.EntityToModel(entity);
-  }
+  /// <param name="serviceProvider">The service provider to get optional model validator.</param>
+  public Service(DbContext dbContext, IServiceProvider serviceProvider) : base(dbContext, serviceProvider) { }
 
   /// <summary>
   /// Retrieves a model by its primary key.

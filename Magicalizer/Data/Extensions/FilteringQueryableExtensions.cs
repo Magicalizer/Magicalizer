@@ -10,7 +10,7 @@ using Magicalizer.Filters.Abstractions;
 namespace Magicalizer.Data.Extensions;
 
 /// <summary>
-/// Provides extension methods for applying filtering to queryable entities based on filter objects.
+/// Provides extension method for applying filtering to queryable entities based on filter objects.
 /// </summary>
 public static class FilteringQueryableExtensions
 {

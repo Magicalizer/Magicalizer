@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <Authors>Dmitry Sikorsky</Authors>
-    <Copyright>Copyright © 2024 Dmitry Sikorsky</Copyright>
-    <VersionPrefix>5.0.0-alpha1</VersionPrefix>
+    <Copyright>Copyright © 2020 Dmitry Sikorsky</Copyright>
+    <VersionPrefix>5.0.0-alpha2</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

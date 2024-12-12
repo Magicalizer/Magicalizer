@@ -40,14 +40,14 @@ public class DefaultControllerFeatureProvider : IApplicationFeatureProvider<Cont
 
       if (modelType == null || entityType == null || filterType == null) continue;
 
-      if (entityType?.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntity<>)) == true)
+      if (entityType?.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntity<,,>)) == true)
       {
-        IEnumerable<Type>? keyTypes = entityType.GetGenericInterfaceTypeParameters(typeof(IEntity<>));
+        IEnumerable<Type>? keyTypes = entityType.GetGenericInterfaceTypeParameters(typeof(IEntity<,,>));
 
         if (keyTypes == null) continue;
 
         feature.Controllers.Add(
-          typeof(DefaultController<,,,>).MakeGenericType(keyTypes.ElementAt(0), modelType, dtoType, filterType).GetTypeInfo()
+          typeof(DefaultController<,,,,>).MakeGenericType(keyTypes.ElementAt(0), keyTypes.ElementAt(1), keyTypes.ElementAt(2), modelType, dtoType, filterType).GetTypeInfo()
         );
       }
 
@@ -62,14 +62,14 @@ public class DefaultControllerFeatureProvider : IApplicationFeatureProvider<Cont
         );
       }
 
-      else if (entityType?.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntity<,,>)) == true)
+      else if (entityType?.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntity<>)) == true)
       {
-        IEnumerable<Type>? keyTypes = entityType.GetGenericInterfaceTypeParameters(typeof(IEntity<,,>));
+        IEnumerable<Type>? keyTypes = entityType.GetGenericInterfaceTypeParameters(typeof(IEntity<>));
 
         if (keyTypes == null) continue;
 
         feature.Controllers.Add(
-          typeof(DefaultController<,,,,>).MakeGenericType(keyTypes.ElementAt(0), keyTypes.ElementAt(1), keyTypes.ElementAt(2), modelType, dtoType, filterType).GetTypeInfo()
+          typeof(DefaultController<,,,>).MakeGenericType(keyTypes.ElementAt(0), modelType, dtoType, filterType).GetTypeInfo()
         );
       }
     }
