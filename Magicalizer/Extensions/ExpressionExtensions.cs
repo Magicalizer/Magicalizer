@@ -22,6 +22,9 @@ public static class ExpressionExtensions
 
     IList<string> propertyNames = [];
 
+    if (property is LambdaExpression lambdaExpression)
+      property = lambdaExpression.Body;
+
     while (property is MemberExpression expression)
     {
       propertyNames.Insert(0, expression.Member.Name);

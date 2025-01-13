@@ -23,7 +23,7 @@ public class Inclusion<TModel> : IInclusion<TModel> where TModel : class, IModel
   /// Initializes a new instance of the <see cref="Inclusion{TModel}"/> class using an expression.
   /// </summary>
   /// <param name="property">The expression defining the property path.</param>
-  public Inclusion(Expression<Func<TModel, object>> property)
+  public Inclusion(Expression<Func<TModel, object?>> property)
   {
     this.PropertyPath = property.GetPropertyPath();
   }

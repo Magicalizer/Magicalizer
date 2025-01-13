@@ -33,7 +33,7 @@ public class Inclusion<TEntity> where TEntity : class, IEntity
   /// Initializes a new instance of the <see cref="Inclusion{TEntity}"/> class using an expression.
   /// </summary>
   /// <param name="property">The expression defining the property path.</param>
-  public Inclusion(Expression<Func<TEntity, object>> property)
+  public Inclusion(Expression<Func<TEntity, object?>> property)
   {
     this.PropertyPath = property.GetPropertyPath();
   }
