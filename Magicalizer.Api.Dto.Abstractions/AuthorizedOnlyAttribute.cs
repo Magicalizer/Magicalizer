@@ -1,4 +1,4 @@
-﻿// Copyright © 2020 Dmitry Sikorsky. All rights reserved.
+﻿// Copyright © 2025 Dmitry Sikorsky. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 namespace Magicalizer.Api.Dto.Abstractions;
@@ -6,7 +6,7 @@ namespace Magicalizer.Api.Dto.Abstractions;
 /// <summary>
 /// Specifies authorization rules for a DTO's controller, validating against a specific policy and HTTP method.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public class AuthorizedOnlyAttribute : Attribute
 {
   /// <summary>
