@@ -27,7 +27,7 @@ public class DefaultController<TKey, TModel, TDto, TFilter> : ControllerBase<TMo
   where TDto : class, IDto, new()
   where TFilter : class, IFilter, new()
 {
-  private readonly IService<TKey, TModel, TFilter> service;
+  protected readonly IService<TKey, TModel, TFilter> service;
 
   /// <summary>
   /// Initializes a new instance of the <see cref="DefaultController{TKey, TModel, TDto, TFilter}"/> class.

@@ -29,7 +29,7 @@ public class DefaultController<TKey1, TKey2, TKey3, TModel, TDto, TFilter> : Con
   where TDto : class, IDto, new()
   where TFilter : class, IFilter, new()
 {
-  private readonly IService<TKey1, TKey2, TKey3, TModel, TFilter> service;
+  protected readonly IService<TKey1, TKey2, TKey3, TModel, TFilter> service;
 
   /// <summary>
   /// Initializes a new instance of the <see cref="DefaultController{TKey1, TKey2, TKey3, TModel, TDto, TFilter}"/> class.
