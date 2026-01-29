@@ -2,6 +2,7 @@
 //// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using Magicalizer.Data.Entities.Abstractions;
@@ -14,6 +15,16 @@ namespace Magicalizer.Data.Extensions;
 /// </summary>
 public static class FilteringQueryableExtensions
 {
+  private static readonly ConcurrentDictionary<Type, PropertyInfo[]> propertiesByTypes = [];
+  private static readonly MethodInfo stringContainsMethod = typeof(string).GetMethod("Contains", [typeof(string)])!;
+  private static readonly MethodInfo enumerableAnyMethod = typeof(Enumerable).GetMethods().First(m => m.Name == "Any" && m.GetParameters().Length == 2);
+  private static readonly MethodInfo enumerableContainsMethod = typeof(Enumerable).GetMethods().First(m => m.Name == "Contains" && m.GetParameters().Length == 2);
+  private static readonly HashSet<Type> valueTypes =
+  [
+    typeof(bool), typeof(byte), typeof(short), typeof(int), typeof(long), typeof(float), typeof(double), typeof(decimal), typeof(string), typeof(Guid), typeof(DateTime),
+    typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>), typeof(IEnumerable<long>), typeof(IEnumerable<float>), typeof(IEnumerable<double>), typeof(IEnumerable<decimal>), typeof(IEnumerable<string>), typeof(IEnumerable<Guid>)
+  ];
+
   /// <summary>
   /// Applies filtering to a queryable result based on the provided filter object.
   /// </summary>
@@ -39,8 +50,9 @@ public static class FilteringQueryableExtensions
   private static Expression? BuildFilterExpression(IFilter filter, ParameterExpression parameter, IList<string> propertyPath)
   {
     Expression? filterExpression = null;
+    PropertyInfo[] properties = propertiesByTypes.GetOrAdd(filter.GetType(), t => t.GetProperties());
 
-    foreach (PropertyInfo property in filter.GetType().GetProperties())
+    foreach (PropertyInfo property in properties)
     {
       if (property.IsDefined(typeof(IgnoreFilterAttribute), inherit: false)) continue;
 
@@ -71,9 +83,8 @@ public static class FilteringQueryableExtensions
   private static Expression? BuildValueExpression(ParameterExpression parameter, IList<string> propertyPath, PropertyInfo property, object propertyValue)
   {
     Expression propertyExpression = BuildPropertyExpression(parameter, propertyPath);
-    Expression? comparisonExpression = BuildComparisonExpression(propertyExpression, property.Name, propertyValue);
 
-    return comparisonExpression == null ? null : comparisonExpression;
+    return BuildComparisonExpression(propertyExpression, property.Name, propertyValue);
   }
 
   // Builds an expression for enumerable filters (e.g., "Any" or "None" in a collection).
@@ -101,11 +112,7 @@ public static class FilteringQueryableExtensions
     if (filterExpression == null) return null;
 
     LambdaExpression filterLambda = Expression.Lambda(filterExpression, parameter);
-    MethodInfo anyMethod = typeof(Enumerable).GetMethods()
-      .First(m => m.Name == "Any" && m.GetParameters().Length == 2)
-      .MakeGenericMethod(entityType);
-
-    Expression any = Expression.Call(anyMethod, enumerableExpression, filterLambda);
+    Expression any = Expression.Call(enumerableAnyMethod.MakeGenericMethod(entityType), enumerableExpression, filterLambda);
 
     if (nonePropertyValue != null)
       any = Expression.Not(any);
@@ -158,11 +165,7 @@ public static class FilteringQueryableExtensions
   {
     if (propertyValue is not string) return null;
 
-    MethodInfo? containsMethod = typeof(string).GetMethod("Contains", [typeof(string)]);
-
-    if (containsMethod == null) return null;
-
-    return Expression.Call(propertyExpression, containsMethod, Expression.Constant(propertyValue));
+    return Expression.Call(propertyExpression, stringContainsMethod, Expression.Constant(propertyValue));
   }
 
   // Builds an "In" expression for filtering based on a list of values.
@@ -170,13 +173,7 @@ public static class FilteringQueryableExtensions
   {
     if (propertyValue is not IEnumerable propertyValues) return null;
 
-    MethodInfo? containsMethod = typeof(Enumerable).GetMethods()
-      .FirstOrDefault(m => m.Name == "Contains" && m.GetParameters().Length == 2)
-      ?.MakeGenericMethod(propertyExpression.Type);
-
-    if (containsMethod == null) return null;
-
-    return Expression.Call(containsMethod, Expression.Constant(propertyValues), propertyExpression);
+    return Expression.Call(enumerableContainsMethod.MakeGenericMethod(propertyExpression.Type), Expression.Constant(propertyValues), propertyExpression);
   }
 
   // Determines if the property is a value type that can be used in comparisons.
@@ -184,10 +181,7 @@ public static class FilteringQueryableExtensions
   {
     Type type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
 
-    return new Type[] {
-      typeof(bool), typeof(byte), typeof(short), typeof(int), typeof(long), typeof(float), typeof(double), typeof(decimal), typeof(string), typeof(Guid), typeof(DateTime),
-      typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>), typeof(IEnumerable<long>), typeof(IEnumerable<float>), typeof(IEnumerable<double>), typeof(IEnumerable<decimal>), typeof(IEnumerable<string>), typeof(IEnumerable<Guid>),
-    }.Contains(type);
+    return valueTypes.Contains(type);
   }
 
   // Checks if the property is an enumerable filter.

@@ -1,6 +1,7 @@
 ﻿// Copyright © 2025 Dmitry Sikorsky. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.Linq.Expressions;
 using System.Reflection;
 using FluentValidation;
 using Magicalizer.Data.Entities.Abstractions;
@@ -9,7 +10,6 @@ using Magicalizer.Domain.Models.Abstractions;
 using Magicalizer.Domain.Services.Abstractions;
 using Magicalizer.Filters.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Magicalizer.Domain.Services;
 
@@ -24,18 +24,22 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   where TModel : class, IModel
   where TFilter : class, IFilter
 {
+  private static readonly Func<TEntity, TModel> mapper = CreateMapper();
   protected readonly DbContext dbContext;
+  protected readonly IEnumerable<IQueryScope<TEntity, TFilter>>? queryScopes;
   protected readonly IValidator<TModel>? validator;
 
   /// <summary>
   /// Initializes a new instance of the <see cref="ServiceBase{TKey, TEntity, TModel, TFilter}"/> class.
   /// </summary>
   /// <param name="dbContext">The database context.</param>
-  /// <param name="serviceProvider">The service provider to get optional model validator.</param>
-  public ServiceBase(DbContext dbContext, IServiceProvider serviceProvider)
+  /// <param name="queryScopes">The optional collection of query scopes to apply global visibility rules or restrictions.</param>
+  /// <param name="validator">The optional model validator.</param>
+  public ServiceBase(DbContext dbContext, IEnumerable<IQueryScope<TEntity, TFilter>>? queryScopes = null, IValidator<TModel>? validator = null)
   {
     this.dbContext = dbContext;
-    this.validator = serviceProvider.GetService<IValidator<TModel>>();
+    this.queryScopes = queryScopes;
+    this.validator = validator;
   }
 
   /// <summary>
@@ -49,19 +53,19 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   /// <returns>The collection of models that match the filter.</returns>
   public virtual async Task<IEnumerable<TModel>> GetAllAsync(TFilter? filter = null, IEnumerable<ISorting<TModel>>? sortings = null, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions)
   {
-    IQueryable<TEntity> result = dbContext.Set<TEntity>().AsNoTracking();
+    IQueryable<TEntity> entities = this.GetScopedQuery(filter);
 
     if (filter != null)
-      result = result.ApplyFiltering(filter);
+      entities = entities.ApplyFiltering(filter);
 
     if (sortings != null)
-      result = result.ApplySorting(sortings.Select(s => new Data.Sorting<TEntity>(s.IsAscending, s.PropertyPath)));
+      entities = entities.ApplySorting(sortings.Select(s => new Data.Sorting<TEntity>(s.IsAscending, s.PropertyPath)));
 
     if (offset != null || limit != null)
-      result = result.ApplyPaging(offset, limit);
+      entities = entities.ApplyPaging(offset, limit);
 
-    result = result.ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)));
-    return (await result.ToListAsync()).Select(e => EntityToModel(e)!);
+    entities = entities.ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)));
+    return (await entities.ToListAsync()).Select(e => EntityToModel(e)!);
   }
 
   /// <summary>
@@ -71,12 +75,12 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   /// <returns>The count of models that match the filter.</returns>
   public virtual async Task<int> CountAsync(TFilter? filter = null)
   {
-    IQueryable<TEntity> result = dbContext.Set<TEntity>().AsNoTracking();
+    IQueryable<TEntity> entities = this.GetScopedQuery(filter);
 
     if (filter != null)
-      result = result.ApplyFiltering(filter);
+      entities = entities.ApplyFiltering(filter);
 
-    return await result.CountAsync();
+    return await entities.CountAsync();
   }
 
   /// <summary>
@@ -90,8 +94,8 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
 
     TEntity entity = (model as IModel<TEntity>)!.ToEntity();
 
-    dbContext.Add(entity);
-    await dbContext.SaveChangesAsync();
+    this.dbContext.Add(entity);
+    await this.dbContext.SaveChangesAsync();
     return this.EntityToModel(entity)!;
   }
 
@@ -112,22 +116,46 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
 
     if (property == null) return;
 
-    TEntity? local = dbContext.Set<TEntity>().Local.FirstOrDefault(e => property.GetValue(e)?.Equals(property.GetValue(entity)) == true);
+    TEntity? local = this.dbContext.Set<TEntity>().Local.FirstOrDefault(e => property.GetValue(e)?.Equals(property.GetValue(entity)) == true);
 
     if (local != null)
-      dbContext.Entry(local).State = EntityState.Detached;
+      this.dbContext.Entry(local).State = EntityState.Detached;
 
-    dbContext.Entry(entity).State = EntityState.Modified;
-    await dbContext.SaveChangesAsync();
+    this.dbContext.Entry(entity).State = EntityState.Modified;
+    await this.dbContext.SaveChangesAsync();
+  }
+
+  protected IQueryable<TEntity> GetScopedQuery(TFilter? filter = null)
+  {
+    IQueryable<TEntity> entities = this.dbContext.Set<TEntity>().AsNoTracking();
+
+    if (this.queryScopes != null)
+      foreach (IQueryScope<TEntity, TFilter> queryFilter in this.queryScopes)
+        entities = queryFilter.Apply(entities, filter);
+
+    return entities;
   }
 
   protected virtual TModel? EntityToModel(TEntity? entity)
   {
-    return entity == null ? null : Activator.CreateInstance(typeof(TModel), entity) as TModel;
+    return entity == null ? null : mapper(entity);
   }
 
   protected virtual Microsoft.EntityFrameworkCore.Metadata.IProperty? GetPrimaryKeyProperty(int index)
   {
     return this.dbContext.Model.FindEntityType(typeof(TEntity))?.FindPrimaryKey()?.Properties[index];
+  }
+
+  private static Func<TEntity, TModel> CreateMapper()
+  {
+    ConstructorInfo? constructor = typeof(TModel).GetConstructor([ typeof(TEntity) ]);
+
+    if (constructor == null)
+      throw new InvalidOperationException($"Type {typeof(TModel).Name} must have a constructor that accepts {typeof(TEntity).Name}");
+
+    ParameterExpression parameter = Expression.Parameter(typeof(TEntity), "entity");
+    NewExpression @new = Expression.New(constructor, parameter);
+
+    return Expression.Lambda<Func<TEntity, TModel>>(@new, parameter).Compile();
   }
 }

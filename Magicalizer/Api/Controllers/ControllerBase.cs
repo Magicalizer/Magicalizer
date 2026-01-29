@@ -1,6 +1,7 @@
 ﻿// Copyright © 2025 Dmitry Sikorsky. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.Linq.Expressions;
 using System.Reflection;
 using Magicalizer.Api.Dto.Abstractions;
 using Magicalizer.Domain.Models.Abstractions;
@@ -22,6 +23,7 @@ public abstract class ControllerBase<TModel, TDto, TFilter> : Controller
   where TDto : class, IDto, new()
   where TFilter : class, IFilter, new()
 {
+  private static readonly Func<TModel, TDto> mapper = CreateMapper();
   protected readonly IAuthorizationService authorizationService;
 
   /// <summary>
@@ -109,6 +111,19 @@ public abstract class ControllerBase<TModel, TDto, TFilter> : Controller
   /// <returns>The converted DTO, or <c>null</c> if the model is <c>null</c>.</returns>
   protected virtual TDto? ModelToDto(TModel? model)
   {
-    return model == null ? null : Activator.CreateInstance(typeof(TDto), model) as TDto;
+    return model == null ? null : mapper(model);
+  }
+
+  private static Func<TModel, TDto> CreateMapper()
+  {
+    ConstructorInfo? constructor = typeof(TDto).GetConstructor([typeof(TModel)]);
+
+    if (constructor == null)
+      throw new InvalidOperationException($"Type {typeof(TDto).Name} must have a constructor that accepts {typeof(TModel).Name}");
+
+    ParameterExpression parameter = Expression.Parameter(typeof(TModel), "model");
+    NewExpression @new = Expression.New(constructor, parameter);
+
+    return Expression.Lambda<Func<TModel, TDto>>(@new, parameter).Compile();
   }
 }

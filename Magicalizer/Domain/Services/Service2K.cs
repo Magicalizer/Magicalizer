@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Reflection;
+using FluentValidation;
 using Magicalizer.Data.Entities.Abstractions;
 using Magicalizer.Data.Extensions;
 using Magicalizer.Domain.Models.Abstractions;
@@ -29,8 +30,9 @@ public class Service<TKey1, TKey2, TEntity, TModel, TFilter> : ServiceBase<TEnti
   /// Initializes a new instance of the <see cref="Service{TKey1, TKey2, TEntity, TModel, TFilter}"/> class.
   /// </summary>
   /// <param name="dbContext">The database context.</param>
-  /// <param name="serviceProvider">The service provider to get optional model validator.</param>
-  public Service(DbContext dbContext, IServiceProvider serviceProvider) : base(dbContext, serviceProvider) { }
+  /// <param name="queryScopes">The optional collection of query scopes to apply global visibility rules or restrictions.</param>
+  /// <param name="validator">The optional model validator.</param>
+  public Service(DbContext dbContext, IEnumerable<IQueryScope<TEntity, TFilter>>? queryScopes = null, IValidator<TModel>? validator = null) : base(dbContext, queryScopes, validator) { }
 
   /// <summary>
   /// Retrieves a model by its composite primary key.
@@ -46,8 +48,7 @@ public class Service<TKey1, TKey2, TEntity, TModel, TFilter> : ServiceBase<TEnti
 
     if (key1 == null || key2 == null) return null;
 
-    TEntity? entity = await dbContext.Set<TEntity>()
-      .AsNoTracking()
+    TEntity? entity = await this.GetScopedQuery()
       .ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)))
       .FirstOrDefaultAsync(
         e => EF.Property<TKey1>(e, key1.Name)!.Equals(id1) &&
@@ -80,7 +81,7 @@ public class Service<TKey1, TKey2, TEntity, TModel, TFilter> : ServiceBase<TEnti
 
       property1.SetValue(entity, id1);
       property2.SetValue(entity, id2);
-      dbContext.Set<TEntity>().Remove(entity);
+      this.dbContext.Set<TEntity>().Remove(entity);
       await this.dbContext.SaveChangesAsync();
       return true;
     }

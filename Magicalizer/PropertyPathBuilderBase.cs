@@ -69,6 +69,16 @@ public class PropertyPathBuilder<TObject, TResult> : PropertyPathBuilderBase<TOb
   /// <summary>
   /// Adds a property to the path and returns a nested builder for further additions.
   /// </summary>
+  public NestedPropertyPathBuilder<TObject, TProperty, TResult> Add<TProperty>(Expression<Func<TObject, IReadOnlyList<TProperty>?>> property)
+    where TProperty : class
+  {
+    this.propertyPath.Add(property.Body);
+    return new NestedPropertyPathBuilder<TObject, TProperty, TResult>(this.resultFactory, this.propertyPath);
+  }
+
+  /// <summary>
+  /// Adds a property to the path and returns a nested builder for further additions.
+  /// </summary>
   public NestedPropertyPathBuilder<TObject, TProperty, TResult> Add<TProperty>(Expression<Func<TObject, ICollection<TProperty>?>> property)
     where TProperty : class
   {
@@ -116,6 +126,16 @@ public class NestedPropertyPathBuilder<TOridinalTObject, TObject, TResult> : Pro
   /// Adds a nested property to the path and returns a nested builder for further additions.
   /// </summary>
   public NestedPropertyPathBuilder<TOridinalTObject, TProperty, TResult> ThenAdd<TProperty>(Expression<Func<TObject, IList<TProperty>?>> property)
+    where TProperty : class
+  {
+    this.propertyPath.Add(property.Body);
+    return new NestedPropertyPathBuilder<TOridinalTObject, TProperty, TResult>(this.resultFactory, this.propertyPath);
+  }
+
+  /// <summary>
+  /// Adds a nested property to the path and returns a nested builder for further additions.
+  /// </summary>
+  public NestedPropertyPathBuilder<TOridinalTObject, TProperty, TResult> ThenAdd<TProperty>(Expression<Func<TObject, IReadOnlyList<TProperty>?>> property)
     where TProperty : class
   {
     this.propertyPath.Add(property.Body);
