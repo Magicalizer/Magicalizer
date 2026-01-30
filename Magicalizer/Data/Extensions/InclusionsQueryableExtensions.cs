@@ -12,25 +12,25 @@ namespace Magicalizer.Data.Extensions;
 public static class InclusionsQueryableExtensions
 {
   /// <summary>
-  /// Applies inclusions to the queryable result using a collection of <see cref="Inclusion{TEntity}"/> objects.
+  /// Applies inclusions to the specified query using a collection of <see cref="Inclusion{TEntity}"/> objects.
   /// </summary>
   /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
-  /// <param name="result">The queryable entity set to apply the inclusions to.</param>
+  /// <param name="query">The source query to apply the inclusions to.</param>
   /// <param name="inclusions">A collection of <see cref="Inclusion{TEntity}"/> objects specifying related entities to include.</param>
-  /// <returns>The modified queryable with the applied inclusions.</returns>
-  public static IQueryable<TEntity> ApplyInclusions<TEntity>(this IQueryable<TEntity> result, IEnumerable<Inclusion<TEntity>> inclusions)
+  /// <returns>The query with the applied inclusions.</returns>
+  public static IQueryable<TEntity> ApplyInclusions<TEntity>(this IQueryable<TEntity> query, IEnumerable<Inclusion<TEntity>>? inclusions)
     where TEntity : class, IEntity
   {
-    if (!inclusions.Any()) return result;
+    if (inclusions?.Any() != true) return query;
 
     foreach (Inclusion<TEntity> inclusion in inclusions)
     {
       string fixedInclusion = PropertyPathFixer.FixPropertyPath<TEntity>(inclusion.PropertyPath);
 
       if (fixedInclusion.Length != 0)
-        result = result.Include(fixedInclusion);
+        query = query.Include(fixedInclusion);
     }
 
-    return result;
+    return query;
   }
 }

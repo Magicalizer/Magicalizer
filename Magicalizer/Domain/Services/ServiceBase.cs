@@ -53,19 +53,13 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   /// <returns>The collection of models that match the filter.</returns>
   public virtual async Task<IEnumerable<TModel>> GetAllAsync(TFilter? filter = null, IEnumerable<ISorting<TModel>>? sortings = null, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions)
   {
-    IQueryable<TEntity> entities = this.GetScopedQuery(filter);
+    IQueryable<TEntity> query = this.GetScopedQuery(filter)
+      .ApplyFiltering(filter)
+      .ApplySorting(sortings?.Select(s => new Data.Sorting<TEntity>(s.IsAscending, s.PropertyPath)))
+      .ApplyPaging(offset, limit)
+      .ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)));
 
-    if (filter != null)
-      entities = entities.ApplyFiltering(filter);
-
-    if (sortings != null)
-      entities = entities.ApplySorting(sortings.Select(s => new Data.Sorting<TEntity>(s.IsAscending, s.PropertyPath)));
-
-    if (offset != null || limit != null)
-      entities = entities.ApplyPaging(offset, limit);
-
-    entities = entities.ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)));
-    return (await entities.ToListAsync()).Select(e => EntityToModel(e)!);
+    return (await query.ToListAsync()).Select(e => EntityToModel(e)!);
   }
 
   /// <summary>
@@ -75,12 +69,7 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   /// <returns>The count of models that match the filter.</returns>
   public virtual async Task<int> CountAsync(TFilter? filter = null)
   {
-    IQueryable<TEntity> entities = this.GetScopedQuery(filter);
-
-    if (filter != null)
-      entities = entities.ApplyFiltering(filter);
-
-    return await entities.CountAsync();
+    return await this.GetScopedQuery(filter).ApplyFiltering(filter).CountAsync();
   }
 
   /// <summary>

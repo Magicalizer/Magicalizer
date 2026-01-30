@@ -12,27 +12,27 @@ namespace Magicalizer.Data.Extensions;
 public static class SortingQueryableExtensions
 {
   /// <summary>
-  /// Applies sorting to the queryable result using a collection of <see cref="Sorting{TEntity}"/> objects.
+  /// Applies sorting to the specified query using a collection of <see cref="Sorting{TEntity}"/> objects.
   /// </summary>
   /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
-  /// <param name="result">The queryable entity set to apply sorting to.</param>
+  /// <param name="query">The source query to apply sorting to.</param>
   /// <param name="sortings">A collection of <see cref="Sorting{TEntity}"/> objects.</param>
-  /// <returns>The modified queryable with the applied sorting.</returns>
-  public static IQueryable<TEntity> ApplySorting<TEntity>(this IQueryable<TEntity> result, IEnumerable<Sorting<TEntity>> sortings)
+  /// <returns>The query with the applied sorting.</returns>
+  public static IQueryable<TEntity> ApplySorting<TEntity>(this IQueryable<TEntity> query, IEnumerable<Sorting<TEntity>>? sortings)
     where TEntity : class, IEntity
   {
-    if (!sortings.Any()) return result;
+    if (sortings?.Any() != true) return query;
 
-    IOrderedQueryable<TEntity>? orderedResult = null;
+    IOrderedQueryable<TEntity>? orderedQuery = null;
 
     foreach (Sorting<TEntity> sorting in sortings)
     {
-      orderedResult = orderedResult == null ?
-        result.OrderBy(FormatSortingOrder(sorting)) :
-        orderedResult.ThenBy(FormatSortingOrder(sorting));
+      orderedQuery = orderedQuery == null ?
+        query.OrderBy(FormatSortingOrder(sorting)) :
+        orderedQuery.ThenBy(FormatSortingOrder(sorting));
     }
 
-    return orderedResult ?? result;
+    return orderedQuery ?? query;
   }
 
   private static string FormatSortingOrder<TEntity>(Sorting<TEntity> sorting)

@@ -11,21 +11,21 @@ namespace Magicalizer.Data.Extensions;
 public static class PagingQueryableExtensions
 {
   /// <summary>
-  /// Applies pagination to the queryable result by skipping and limiting the number of entities.
+  /// Applies pagination to the specified query by skipping and limiting the number of entities.
   /// </summary>
   /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
-  /// <param name="result">The queryable entity set to apply pagination to.</param>
+  /// <param name="query">The source query to apply pagination to.</param>
   /// <param name="offset">The number of entities to skip.</param>
   /// <param name="limit">The maximum number of entities to return.</param>
-  /// <returns>The modified queryable with the applied pagination.</returns>
-  public static IQueryable<TEntity> ApplyPaging<TEntity>(this IQueryable<TEntity> result, int? offset, int? limit) where TEntity : class, IEntity
+  /// <returns>The query with the applied pagination.</returns>
+  public static IQueryable<TEntity> ApplyPaging<TEntity>(this IQueryable<TEntity> query, int? offset, int? limit) where TEntity : class, IEntity
   {
     if (offset != null)
-      result = result.Skip((int)offset);
+      query = query.Skip((int)offset);
 
     if (limit != null)
-      result = result.Take((int)limit);
+      query = query.Take((int)limit);
 
-    return result;
+    return query;
   }
 }

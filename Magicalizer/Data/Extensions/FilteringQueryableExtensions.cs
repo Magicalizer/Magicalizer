@@ -26,24 +26,24 @@ public static class FilteringQueryableExtensions
   ];
 
   /// <summary>
-  /// Applies filtering to a queryable result based on the provided filter object.
+  /// Applies filtering logic to the specified query based on the provided filter object.
   /// </summary>
   /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
   /// <typeparam name="TEntityFilter">The type of the filter object.</typeparam>
-  /// <param name="result">The queryable entity set to apply the filter to.</param>
-  /// <param name="filter">The filter object used to apply conditions to the query.</param>
-  /// <returns>The filtered queryable result.</returns>
-  public static IQueryable<TEntity> ApplyFiltering<TEntity, TEntityFilter>(this IQueryable<TEntity> result, TEntityFilter filter) where TEntity : class, IEntity where TEntityFilter : class, IFilter
+  /// <param name="query">The source query to apply the filter to.</param>
+  /// <param name="filter">The filter object containing the criteria.</param>
+  /// <returns>The filtered query.</returns>
+  public static IQueryable<TEntity> ApplyFiltering<TEntity, TEntityFilter>(this IQueryable<TEntity> query, TEntityFilter? filter) where TEntity : class, IEntity where TEntityFilter : class, IFilter
   {
-    if (filter == null) return result;
+    if (filter == null) return query;
 
     ParameterExpression parameter = Expression.Parameter(typeof(TEntity), "e");
     Expression? filterExpression = BuildFilterExpression(filter, parameter, []);
 
     if (filterExpression != null)
-      result = result.Where(Expression.Lambda<Func<TEntity, bool>>(filterExpression, parameter));
+      query = query.Where(Expression.Lambda<Func<TEntity, bool>>(filterExpression, parameter));
 
-    return result;
+    return query;
   }
 
   // Builds the filter expression based on the filter properties.
