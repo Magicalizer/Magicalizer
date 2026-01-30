@@ -28,9 +28,9 @@ where TFilter : class, IFilter
   /// Initializes a new instance of the <see cref="Service{TKey, TEntity, TModel, TFilter}"/> class.
   /// </summary>
   /// <param name="dbContext">The database context.</param>
-  /// <param name="queryScopes">The optional collection of query scopes to apply global visibility rules or restrictions.</param>
+  /// <param name="queryPrefilters">The optional collection of query prefilters to apply initial restrictions, security rules, or mandatory logic.</param>
   /// <param name="validator">The optional model validator.</param>
-  public Service(DbContext dbContext, IEnumerable<IQueryScope<TEntity, TFilter>>? queryScopes = null, IValidator<TModel>? validator = null) : base(dbContext, queryScopes, validator) { }
+  public Service(DbContext dbContext, IEnumerable<IQueryPrefilter<TEntity, TFilter>>? queryPrefilters = null, IValidator<TModel>? validator = null) : base(dbContext, queryPrefilters, validator) { }
 
   /// <summary>
   /// Retrieves a model by its primary key.
@@ -44,7 +44,9 @@ where TFilter : class, IFilter
 
     if (key == null) return null;
 
-    TEntity? entity = await this.GetScopedQuery()
+    TFilter? filter = this.GetPreprocessedFilter();
+    TEntity? entity = await this.GetPrefilteredQuery(filter)
+      .ApplyFiltering(filter)
       .ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)))
       .FirstOrDefaultAsync(e => EF.Property<TKey>(e, key.Name)!.Equals(id));
 

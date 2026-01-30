@@ -26,19 +26,19 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
 {
   private static readonly Func<TEntity, TModel> mapper = CreateMapper();
   protected readonly DbContext dbContext;
-  protected readonly IEnumerable<IQueryScope<TEntity, TFilter>>? queryScopes;
+  protected readonly IEnumerable<IQueryPrefilter<TEntity, TFilter>>? queryPrefilters;
   protected readonly IValidator<TModel>? validator;
 
   /// <summary>
   /// Initializes a new instance of the <see cref="ServiceBase{TKey, TEntity, TModel, TFilter}"/> class.
   /// </summary>
   /// <param name="dbContext">The database context.</param>
-  /// <param name="queryScopes">The optional collection of query scopes to apply global visibility rules or restrictions.</param>
+  /// <param name="queryPrefilters">The optional collection of query prefilters to apply initial restrictions, security rules, or mandatory logic.</param>
   /// <param name="validator">The optional model validator.</param>
-  public ServiceBase(DbContext dbContext, IEnumerable<IQueryScope<TEntity, TFilter>>? queryScopes = null, IValidator<TModel>? validator = null)
+  public ServiceBase(DbContext dbContext, IEnumerable<IQueryPrefilter<TEntity, TFilter>>? queryPrefilters = null, IValidator<TModel>? validator = null)
   {
     this.dbContext = dbContext;
-    this.queryScopes = queryScopes;
+    this.queryPrefilters = queryPrefilters;
     this.validator = validator;
   }
 
@@ -53,7 +53,9 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   /// <returns>The collection of models that match the filter.</returns>
   public virtual async Task<IEnumerable<TModel>> GetAllAsync(TFilter? filter = null, IEnumerable<ISorting<TModel>>? sortings = null, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions)
   {
-    IQueryable<TEntity> query = this.GetScopedQuery(filter)
+    filter = this.GetPreprocessedFilter(filter);
+
+    IQueryable<TEntity> query = this.GetPrefilteredQuery(filter)
       .ApplyFiltering(filter)
       .ApplySorting(sortings?.Select(s => new Data.Sorting<TEntity>(s.IsAscending, s.PropertyPath)))
       .ApplyPaging(offset, limit)
@@ -69,7 +71,8 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
   /// <returns>The count of models that match the filter.</returns>
   public virtual async Task<int> CountAsync(TFilter? filter = null)
   {
-    return await this.GetScopedQuery(filter).ApplyFiltering(filter).CountAsync();
+    filter = this.GetPreprocessedFilter(filter);
+    return await this.GetPrefilteredQuery(filter).ApplyFiltering(filter).CountAsync();
   }
 
   /// <summary>
@@ -114,13 +117,18 @@ public abstract class ServiceBase<TEntity, TModel, TFilter> : IService<TModel, T
     await this.dbContext.SaveChangesAsync();
   }
 
-  protected IQueryable<TEntity> GetScopedQuery(TFilter? filter = null)
+  protected virtual TFilter? GetPreprocessedFilter(TFilter? filter = null)
+  {
+    return filter;
+  }
+
+  protected virtual IQueryable<TEntity> GetPrefilteredQuery(TFilter? filter)
   {
     IQueryable<TEntity> entities = this.dbContext.Set<TEntity>().AsNoTracking();
 
-    if (this.queryScopes != null)
-      foreach (IQueryScope<TEntity, TFilter> queryFilter in this.queryScopes)
-        entities = queryFilter.Apply(entities, filter);
+    if (this.queryPrefilters != null)
+      foreach (IQueryPrefilter<TEntity, TFilter> queryPrefilter in this.queryPrefilters)
+        entities = queryPrefilter.Apply(entities, filter);
 
     return entities;
   }
