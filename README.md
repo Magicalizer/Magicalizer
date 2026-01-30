@@ -1,4 +1,4 @@
-# Magicalizer 5.0.0
+# Magicalizer 6.0.0
 
 ![Magicalizer logotype](https://magicalizer.net/magicalizer_github_icon.png)
 
