@@ -95,8 +95,16 @@ public static class ServiceCollectionExtensions
         return;
     }
 
-    Type? serviceImplementationType = genericServiceType.GetImplementations().FirstOrDefault();
+    Type? customServiceImplementationType = genericServiceType.GetImplementations().FirstOrDefault();
 
-    services.AddScoped(genericServiceType, serviceImplementationType ?? genericServiceImplementationType);
+    services.AddScoped(genericServiceType, customServiceImplementationType ?? genericServiceImplementationType);
+
+    if (customServiceImplementationType != null)
+    {
+      IEnumerable<Type> customServiceTypes = customServiceImplementationType.GetInterfaces().Where(i => i != genericServiceType && genericServiceType.IsAssignableFrom(i));
+
+      foreach (Type customServiceType in customServiceTypes)
+        services.AddScoped(customServiceType, customServiceImplementationType);
+    }
   }
 }
