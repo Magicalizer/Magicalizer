@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>Dmitry Sikorsky</Authors>
     <Copyright>Copyright © 2020 Dmitry Sikorsky</Copyright>
-    <VersionPrefix>6.0.0-beta4</VersionPrefix>
+    <VersionPrefix>6.0.0-beta5</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

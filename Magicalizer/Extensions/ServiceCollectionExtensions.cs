@@ -15,16 +15,17 @@ namespace Magicalizer.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-  /// <summary>
-  /// Registers and configures all the services that are required to process the REST API requests.
-  /// </summary>
-  public static void AddMagicalizer(this IServiceCollection services)
+  /// <summary>
+  /// Registers and configures all the services that are required to process the REST API requests.
+  /// </summary>
+  public static void AddMagicalizer(this IServiceCollection services)
   {
     AddDomainServices(services);
 
     IMvcBuilder mvcBuilder = services.AddControllers();
 
     mvcBuilder.AddMvcOptions(setupAction => {
+      setupAction.ModelBinderProviders.Insert(0, new EnumerableFilterBinderProvider());
       setupAction.Conventions.Add(new DefaultControllerRouteConvention());
     });
 
@@ -64,8 +65,8 @@ public static class ServiceCollectionExtensions
   private static Type[] GetKeyTypes(Type entityType)
   {
     return entityType.GetInterfaces().FirstOrDefault(
-      i => i.IsGenericType &&
-        (i.GetGenericTypeDefinition() == typeof(IEntity<>) || i.GetGenericTypeDefinition() == typeof(IEntity<,>) || i.GetGenericTypeDefinition() == typeof(IEntity<,,>))
+    i => i.IsGenericType &&
+    (i.GetGenericTypeDefinition() == typeof(IEntity<>) || i.GetGenericTypeDefinition() == typeof(IEntity<,>) || i.GetGenericTypeDefinition() == typeof(IEntity<,,>))
     )?.GetGenericArguments() ?? [];
   }
 
