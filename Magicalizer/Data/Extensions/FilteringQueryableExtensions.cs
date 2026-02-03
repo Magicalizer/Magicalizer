@@ -61,13 +61,18 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
       if (propertyValue == null) continue;
 
       if (IsValue(property))
-        filterExpression = CombineExpressions(filterExpression, BuildValueExpression(parameter, propertyPath, property, propertyValue)!);
+      {
+        Expression? valueExpression = BuildValueExpression(parameter, propertyPath, property, propertyValue);
+
+        if (valueExpression != null)
+          filterExpression = CombineExpressions(filterExpression, valueExpression);
+      }
 
       else if (IsEnumerableFilter(property))
       {
         IEnumerableFilter enumerableFilter = (IEnumerableFilter)propertyValue;
 
-        if (enumerableFilter.Any != null)
+        if (enumerableFilter.Any != null)
         {
           foreach (IFilter anyFilter in enumerableFilter.Any)
           {
@@ -78,7 +83,7 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
           }
         }
 
-        if (enumerableFilter.None != null)
+        if (enumerableFilter.None != null)
         {
           foreach (IFilter noneFilter in enumerableFilter.None)
           {
@@ -91,7 +96,12 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
       }
 
       else if (IsFilter(property))
-        filterExpression = CombineExpressions(filterExpression, BuildFilterExpression(parameter, propertyPath, property, propertyValue)!);
+      {
+        Expression? nestedFilterExpression = BuildFilterExpression(parameter, propertyPath, property, propertyValue);
+
+        if (nestedFilterExpression != null)
+          filterExpression = CombineExpressions(filterExpression, nestedFilterExpression);
+      }
     }
 
     return filterExpression;
@@ -158,6 +168,9 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
   private static Expression? BuildComparisonExpression(Expression propertyExpression, string criterionName, object propertyValue)
   {
     Expression propertyValueExpression = Expression.Constant(propertyValue, propertyValue.GetType());
+
+    if (propertyExpression.Type != propertyValueExpression.Type && Nullable.GetUnderlyingType(propertyExpression.Type) == propertyValueExpression.Type)
+      propertyValueExpression = Expression.Convert(propertyValueExpression, propertyExpression.Type);
 
     return criterionName switch
     {
