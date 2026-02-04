@@ -18,7 +18,7 @@ namespace Magicalizer.Api.Controllers;
 /// <typeparam name="TModel">The model type.</typeparam>
 /// <typeparam name="TDto">The DTO type.</typeparam>
 /// <typeparam name="TFilter">The filter type.</typeparam>
-public abstract class ControllerBase<TModel, TDto, TFilter> : Controller
+public abstract class ControllerBase<TModel, TDto, TFilter> : ControllerBase
   where TModel : class, IModel, new()
   where TDto : class, IDto, new()
   where TFilter : class, IFilter, new()
