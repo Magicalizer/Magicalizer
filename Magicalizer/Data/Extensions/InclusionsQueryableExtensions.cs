@@ -25,10 +25,10 @@ public static class InclusionsQueryableExtensions
 
     foreach (Inclusion<TEntity> inclusion in inclusions)
     {
-      string fixedInclusion = PropertyPathFixer.FixPropertyPath<TEntity>(inclusion.PropertyPath);
+      string fixedPropertyPath = PropertyPathFixer.FixPropertyPath<TEntity>(inclusion.PropertyPath);
 
-      if (fixedInclusion.Length != 0)
-        query = query.Include(fixedInclusion);
+      if (fixedPropertyPath.Length != 0)
+        query = query.Include(fixedPropertyPath);
     }
 
     return query;

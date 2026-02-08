@@ -27,6 +27,10 @@ public static class SortingQueryableExtensions
 
     foreach (Sorting<TEntity> sorting in sortings)
     {
+      string fixedPropertyPath = PropertyPathFixer.FixPropertyPath<TEntity>(sorting.PropertyPath);
+
+      if (fixedPropertyPath.Length == 0) continue;
+
       orderedQuery = orderedQuery == null ?
         query.OrderBy(FormatSortingOrder(sorting)) :
         orderedQuery.ThenBy(FormatSortingOrder(sorting));

@@ -1,6 +1,7 @@
 ﻿// Copyright © 2025 Dmitry Sikorsky. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.Collections.Concurrent;
 using System.Reflection;
 
 namespace Magicalizer;
@@ -10,6 +11,8 @@ namespace Magicalizer;
 /// </summary>
 public static class PropertyPathFixer
 {
+  private static readonly ConcurrentDictionary<Type, PropertyInfo[]> propertiesByTypes = [];
+
   /// <summary>
   /// Fixes the property path by matching it to the actual property names of the given type.
   /// </summary>
@@ -19,19 +22,20 @@ public static class PropertyPathFixer
   public static string FixPropertyPath<T>(string propertyPath)
   {
     Type type = typeof(T);
-    IEnumerable<string> propertyPathSegments = propertyPath.Split('.');
+    string[] propertyPathSegments = propertyPath.Split('.');
     IList<string> fixedPropertyPath = [];
 
     foreach (string propertyPathSegment in propertyPathSegments)
     {
-      PropertyInfo? property = type.GetProperty(propertyPathSegment, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+      PropertyInfo[] properties = propertiesByTypes.GetOrAdd(type, static t => t.GetProperties());
+      PropertyInfo? property = Array.Find(properties, p => p.Name.Equals(propertyPathSegment, StringComparison.OrdinalIgnoreCase));
 
       if (property == null)
         break;
 
       fixedPropertyPath.Add(property.Name);
       type = property.PropertyType.IsGenericType ?
-        property.PropertyType.GetGenericArguments().First() :
+        property.PropertyType.GetGenericArguments()[0] :
         property.PropertyType;
     }
 
