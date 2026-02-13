@@ -181,7 +181,9 @@ public class DefaultController<TKey, TModel, TDto, TFilter> : ControllerBase<TMo
     if (validationResult != null)
       return validationResult;
 
-    await this.service.DeleteAsync(id);
-    return this.NoContent();
+    if (await this.service.DeleteAsync(id))
+      return this.NoContent();
+
+    return this.Conflict();
   }
 }
