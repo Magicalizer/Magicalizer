@@ -9,6 +9,16 @@ namespace Magicalizer.Filters.Abstractions;
 /// <typeparam name="TFilter">The filter type applied to the elements in the collection.</typeparam>
 public class EnumerableFilter<TFilter> : IEnumerableFilter, IFilter where TFilter : IFilter
 {
+  /// <summary>
+  /// Specifies that the collection must be empty (contain no elements).
+  /// </summary>
+  public bool? IsEmpty { get; set; }
+
+  /// <summary>
+  /// Specifies that the collection must be non-empty (contain at least one element).
+  /// </summary>
+  public bool? IsNotEmpty { get; set; }
+
   /// <summary>
   ///  Specifies a condition that at least one element in the collection must satisfy.
   /// </summary>
@@ -29,10 +39,14 @@ public class EnumerableFilter<TFilter> : IEnumerableFilter, IFilter where TFilte
   /// <summary>
   /// Initializes a new instance of the <see cref="EnumerableFilter{TFilter}"/> class with specific filter conditions.
   /// </summary>
+  /// <param name="isEmpty">If true, the collection must be empty.</param>
+  /// <param name="isNotEmpty">If true, the collection must be non-empty.</param>
   /// <param name="any">A condition that at least one element must satisfy.</param>
   /// <param name="none">A condition that no elements should satisfy.</param>
-  public EnumerableFilter(IEnumerable<TFilter>? any = default, IEnumerable<TFilter>? none = default)
+  public EnumerableFilter(bool? isEmpty = null, bool? isNotEmpty = null, IEnumerable<TFilter>? any = default, IEnumerable<TFilter>? none = default)
   {
+    this.IsEmpty = isEmpty;
+    this.IsNotEmpty = IsNotEmpty;
     this.Any = any;
     this.None = none;
   }

@@ -6,7 +6,7 @@ namespace Magicalizer.Api.Dto.Abstractions;
 /// <summary>
 /// Specifies authentication rules for a DTO's controller, validating only that the user is authenticated for a specific HTTP method.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public class AuthenticatedOnlyAttribute : Attribute
 {
   /// <summary>
