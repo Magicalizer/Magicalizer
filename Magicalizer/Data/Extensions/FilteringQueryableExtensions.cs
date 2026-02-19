@@ -17,6 +17,7 @@ public static class FilteringQueryableExtensions
 {
   private static readonly ConcurrentDictionary<Type, PropertyInfo[]> propertiesByTypes = [];
   private static readonly MethodInfo stringContainsMethod = typeof(string).GetMethod("Contains", [typeof(string)])!;
+  private static readonly MethodInfo enumerableAnyNoPredicateMethod = typeof(Enumerable).GetMethods().First(m => m.Name == "Any" && m.GetParameters().Length == 1);
   private static readonly MethodInfo enumerableAnyMethod = typeof(Enumerable).GetMethods().First(m => m.Name == "Any" && m.GetParameters().Length == 2);
   private static readonly MethodInfo enumerableContainsMethod = typeof(Enumerable).GetMethods().First(m => m.Name == "Contains" && m.GetParameters().Length == 2);
   private static readonly HashSet<Type> valueTypes =
@@ -72,6 +73,14 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
       {
         IEnumerableFilter enumerableFilter = (IEnumerableFilter)propertyValue;
 
+        if (enumerableFilter.IsEmpty == true || enumerableFilter.IsNotEmpty == true)
+        {
+          Expression? emptinessExpression = BuildEnumerableEmptinessExpression(parameter, propertyPath, property, isNotEmpty: enumerableFilter.IsNotEmpty == true);
+
+          if (emptinessExpression != null)
+            filterExpression = CombineExpressions(filterExpression, emptinessExpression);
+        }
+
         if (enumerableFilter.Any != null)
         {
           foreach (IFilter anyFilter in enumerableFilter.Any)
@@ -119,6 +128,21 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
     Expression propertyExpression = BuildPropertyExpression(parameter, propertyPath);
 
     return BuildComparisonExpression(propertyExpression, property.Name, propertyValue);
+  }
+
+  // Builds an expression to check whether a collection is empty or non-empty.
+  private static Expression? BuildEnumerableEmptinessExpression(ParameterExpression parameter, IList<string> propertyPath, PropertyInfo property, bool isNotEmpty)
+  {
+    Expression enumerableExpression = BuildPropertyExpression(parameter, [.. propertyPath, property.Name]);
+    PropertyInfo? entityNavigationProperty = parameter.Type.GetProperty(property.Name);
+
+    if (entityNavigationProperty == null || !entityNavigationProperty.PropertyType.IsGenericType || entityNavigationProperty.PropertyType.GetGenericArguments().Length == 0) return null;
+
+    Type entityType = entityNavigationProperty.PropertyType.GetGenericArguments()[0];
+    MethodInfo enumerableAnyNoPredicateMethod = FilteringQueryableExtensions.enumerableAnyNoPredicateMethod.MakeGenericMethod(entityType);
+    Expression anyCall = Expression.Call(enumerableAnyNoPredicateMethod, enumerableExpression);
+
+    return isNotEmpty ? anyCall : Expression.Not(anyCall);
   }
 
   // Builds an expression for enumerable filters (e.g., "Any" or "None" in a collection).
