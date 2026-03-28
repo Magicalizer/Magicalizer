@@ -188,18 +188,24 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
     return expression;
   }
 
-  // Builds a comparison expression based on the filter criterion (e.g., Equals, From, To).
-  private static Expression? BuildComparisonExpression(Expression propertyExpression, string criterionName, object propertyValue)
+  // Builds a comparison expression based on the filter criterion (e.g., Equals, From, To).
+  private static Expression? BuildComparisonExpression(Expression propertyExpression, string criterionName, object propertyValue)
   {
     Expression propertyValueExpression = Expression.Constant(propertyValue, propertyValue.GetType());
 
     if (propertyExpression.Type != propertyValueExpression.Type && Nullable.GetUnderlyingType(propertyExpression.Type) == propertyValueExpression.Type)
       propertyValueExpression = Expression.Convert(propertyValueExpression, propertyExpression.Type);
 
+    bool isNonNullableValueType = propertyExpression.Type.IsValueType && Nullable.GetUnderlyingType(propertyExpression.Type) == null;
+
     return criterionName switch
     {
-      "IsNull" => Expression.Equal(propertyExpression, Expression.Constant(null)),
-      "IsNotNull" => Expression.NotEqual(propertyExpression, Expression.Constant(null)),
+      "IsNull" => isNonNullableValueType
+          ? Expression.Constant(false)
+          : Expression.Equal(propertyExpression, Expression.Constant(null, propertyExpression.Type)),
+      "IsNotNull" => isNonNullableValueType
+          ? Expression.Constant(true)
+          : Expression.NotEqual(propertyExpression, Expression.Constant(null, propertyExpression.Type)),
       "Equals" => Expression.Equal(propertyExpression, propertyValueExpression),
       "NotEquals" => Expression.NotEqual(propertyExpression, propertyValueExpression),
       "From" => Expression.GreaterThanOrEqual(propertyExpression, propertyValueExpression),
@@ -222,6 +228,15 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
   private static MethodCallExpression? BuildInExpression(Expression propertyExpression, object propertyValue)
   {
     if (propertyValue is not IEnumerable propertyValues) return null;
+
+    Type? underlyingType = Nullable.GetUnderlyingType(propertyExpression.Type);
+
+    if (underlyingType != null)
+    {
+      MethodInfo castMethod = typeof(Enumerable).GetMethod("Cast")!.MakeGenericMethod(propertyExpression.Type);
+
+      propertyValues = (IEnumerable)castMethod.Invoke(null, [propertyValues])!;
+    }
 
     return Expression.Call(enumerableContainsMethod.MakeGenericMethod(propertyExpression.Type), Expression.Constant(propertyValues), propertyExpression);
   }
