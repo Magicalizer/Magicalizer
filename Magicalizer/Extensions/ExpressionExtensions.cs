@@ -17,13 +17,13 @@ public static class ExpressionExtensions
   /// <returns>A string representing the property path (e.g., "Category.Name").</returns>
   public static string GetPropertyPath(this Expression? property)
   {
-    // if (body is UnaryExpression unaryExpression && unaryExpression.NodeType == ExpressionType.Convert)
-    //  body = unaryExpression.Operand;
-
     IList<string> propertyNames = [];
 
     if (property is LambdaExpression lambdaExpression)
       property = lambdaExpression.Body;
+
+    if (property is UnaryExpression unaryExpression && unaryExpression.NodeType == ExpressionType.Convert)
+      property = unaryExpression.Operand;
 
     while (property is MemberExpression expression)
     {
