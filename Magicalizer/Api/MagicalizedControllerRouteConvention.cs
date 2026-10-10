@@ -12,7 +12,7 @@ namespace Magicalizer.Api;
 /// Applies a custom routing convention for controllers that use DTOs decorated with the <see cref="MagicalizedAttribute"/>.
 /// This convention dynamically sets the route for controllers based on the route specified in the attribute.
 /// </summary>
-public class DefaultControllerRouteConvention : IControllerModelConvention
+public class MagicalizedControllerRouteConvention : IControllerModelConvention
 {
   /// <summary>
   /// Applies the route convention to the controller.
@@ -24,8 +24,14 @@ public class DefaultControllerRouteConvention : IControllerModelConvention
   {
     if (controller.ControllerType.IsGenericType)
     {
-      Type? dtoType = controller.ControllerType.GenericTypeArguments.FirstOrDefault(t => typeof(IDto).IsAssignableFrom(t));
+      Type? dtoType = MagicalizedControllerConventionHelper.GetDtoType(controller.ControllerType);
       MagicalizedAttribute? magicalizedAttribute = dtoType?.GetCustomAttribute<MagicalizedAttribute>();
+
+      // All the magicalized controllers share the same type name, so the DTO name is added
+      // to make the controller names unique (e.g. "MagicalizedController<Product>"). Otherwise, the links (e.g. to a created model)
+      // can be generated for another controller.
+      if (dtoType != null)
+        controller.ControllerName = $"MagicalizedController<{dtoType.Name}>";
 
       if (magicalizedAttribute?.Route != null)
       {

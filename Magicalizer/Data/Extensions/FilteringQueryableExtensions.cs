@@ -1,5 +1,5 @@
-﻿//// Copyright © 2025 Dmitry Sikorsky. All rights reserved.
-//// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+﻿// Copyright © 2025 Dmitry Sikorsky. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections;
 using System.Collections.Concurrent;
@@ -26,15 +26,15 @@ public static class FilteringQueryableExtensions
 typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>), typeof(IEnumerable<long>), typeof(IEnumerable<float>), typeof(IEnumerable<double>), typeof(IEnumerable<decimal>), typeof(IEnumerable<string>), typeof(IEnumerable<Guid>)
   ];
 
-  /// <summary>
-  /// Applies filtering logic to the specified query based on the provided filter object.
-  /// </summary>
-  /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
-  /// <typeparam name="TEntityFilter">The type of the filter object.</typeparam>
-  /// <param name="query">The source query to apply the filter to.</param>
-  /// <param name="filter">The filter object containing the criteria.</param>
-  /// <returns>The filtered query.</returns>
-  public static IQueryable<TEntity> ApplyFiltering<TEntity, TEntityFilter>(this IQueryable<TEntity> query, TEntityFilter? filter) where TEntity : class, IEntity where TEntityFilter : class, IFilter
+  /// <summary>
+  /// Applies filtering logic to the specified query based on the provided filter object.
+  /// </summary>
+  /// <typeparam name="TEntity">The type of the entity being queried.</typeparam>
+  /// <typeparam name="TEntityFilter">The type of the filter object.</typeparam>
+  /// <param name="query">The source query to apply the filter to.</param>
+  /// <param name="filter">The filter object containing the criteria.</param>
+  /// <returns>The filtered query.</returns>
+  public static IQueryable<TEntity> ApplyFiltering<TEntity, TEntityFilter>(this IQueryable<TEntity> query, TEntityFilter? filter) where TEntity : class, IEntity where TEntityFilter : class, IFilter
   {
     if (filter == null) return query;
 
@@ -47,8 +47,8 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
     return query;
   }
 
-  // Builds the filter expression based on the filter properties.
-  private static Expression? BuildFilterExpression(IFilter filter, ParameterExpression parameter, IList<string> propertyPath)
+  // Builds the filter expression based on the filter properties.
+  private static Expression? BuildFilterExpression(IFilter filter, ParameterExpression parameter, IList<string> propertyPath)
   {
     Expression? filterExpression = null;
     PropertyInfo[] properties = propertiesByTypes.GetOrAdd(filter.GetType(), t => t.GetProperties());
@@ -116,14 +116,14 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
     return filterExpression;
   }
 
-  // Combines multiple filter expressions using "AND" logic.
-  private static Expression CombineExpressions(Expression? left, Expression right)
+  // Combines multiple filter expressions using "AND" logic.
+  private static Expression CombineExpressions(Expression? left, Expression right)
   {
     return left == null ? right : Expression.AndAlso(left, right);
   }
 
-  // Builds an expression to compare the property value with the filter criteria (e.g., equals, contains).
-  private static Expression? BuildValueExpression(ParameterExpression parameter, IList<string> propertyPath, PropertyInfo property, object propertyValue)
+  // Builds an expression to compare the property value with the filter criteria (e.g., equals, contains).
+  private static Expression? BuildValueExpression(ParameterExpression parameter, IList<string> propertyPath, PropertyInfo property, object propertyValue)
   {
     Expression propertyExpression = BuildPropertyExpression(parameter, propertyPath);
 
@@ -134,26 +134,22 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
   private static Expression? BuildEnumerableEmptinessExpression(ParameterExpression parameter, IList<string> propertyPath, PropertyInfo property, bool isNotEmpty)
   {
     Expression enumerableExpression = BuildPropertyExpression(parameter, [.. propertyPath, property.Name]);
-    PropertyInfo? entityNavigationProperty = parameter.Type.GetProperty(property.Name);
+    Type? entityType = GetElementType(enumerableExpression.Type);
 
-    if (entityNavigationProperty == null || !entityNavigationProperty.PropertyType.IsGenericType || entityNavigationProperty.PropertyType.GetGenericArguments().Length == 0) return null;
-
-    Type entityType = entityNavigationProperty.PropertyType.GetGenericArguments()[0];
+    if (entityType == null) return null;
     MethodInfo enumerableAnyNoPredicateMethod = FilteringQueryableExtensions.enumerableAnyNoPredicateMethod.MakeGenericMethod(entityType);
     Expression anyCall = Expression.Call(enumerableAnyNoPredicateMethod, enumerableExpression);
 
     return isNotEmpty ? anyCall : Expression.Not(anyCall);
   }
 
-  // Builds an expression for enumerable filters (e.g., "Any" or "None" in a collection).
-  private static Expression? BuildEnumerableFilterExpression(ParameterExpression parameter, IList<string> propertyPath, PropertyInfo property, IFilter filter, bool isNone)
+  // Builds an expression for enumerable filters (e.g., "Any" or "None" in a collection).
+  private static Expression? BuildEnumerableFilterExpression(ParameterExpression parameter, IList<string> propertyPath, PropertyInfo property, IFilter filter, bool isNone)
   {
     Expression enumerableExpression = BuildPropertyExpression(parameter, [.. propertyPath, property.Name]);
-    PropertyInfo? entityNavigationProperty = parameter.Type.GetProperty(property.Name);
+    Type? entityType = GetElementType(enumerableExpression.Type);
 
-    if (entityNavigationProperty == null || !entityNavigationProperty.PropertyType.IsGenericType || entityNavigationProperty.PropertyType.GetGenericArguments().Length == 0) return null;
-
-    Type entityType = entityNavigationProperty.PropertyType.GetGenericArguments()[0];
+    if (entityType == null) return null;
 
     parameter = Expression.Parameter(entityType, "e");
 
@@ -167,8 +163,17 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
     return isNone ? Expression.Not(anyExpression) : anyExpression;
   }
 
-  // Recursively builds filter expressions for nested filters.
-  private static Expression? BuildFilterExpression(ParameterExpression parameter, IList<string> propertyPath, PropertyInfo property, object propertyValue)
+  // Gets the element type of a collection (e.g. "Product" for "ICollection<Product>"), or null if the type is not a collection.
+  // The type is taken from the collection expression itself, as the collection may belong to a nested object rather than to the root one.
+  private static Type? GetElementType(Type type)
+  {
+    if (type.IsArray) return type.GetElementType();
+
+    return type.GetInterfaces().Append(type).FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))?.GetGenericArguments()[0];
+  }
+
+  // Recursively builds filter expressions for nested filters.
+  private static Expression? BuildFilterExpression(ParameterExpression parameter, IList<string> propertyPath, PropertyInfo property, object propertyValue)
   {
     IFilter? filter = propertyValue as IFilter;
 
@@ -177,8 +182,8 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
     return BuildFilterExpression(filter, parameter, [.. propertyPath, property.Name]);
   }
 
-  // Builds an expression for the given property path.
-  private static Expression BuildPropertyExpression(ParameterExpression parameter, IList<string> propertyPath)
+  // Builds an expression for the given property path.
+  private static Expression BuildPropertyExpression(ParameterExpression parameter, IList<string> propertyPath)
   {
     Expression expression = parameter;
 
@@ -216,16 +221,16 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
     };
   }
 
-  // Builds a "Contains" expression for string filtering.
-  private static MethodCallExpression? BuildContainsExpression(Expression propertyExpression, object propertyValue)
+  // Builds a "Contains" expression for string filtering.
+  private static MethodCallExpression? BuildContainsExpression(Expression propertyExpression, object propertyValue)
   {
     if (propertyValue is not string) return null;
 
     return Expression.Call(propertyExpression, stringContainsMethod, Expression.Constant(propertyValue));
   }
 
-  // Builds an "In" expression for filtering based on a list of values.
-  private static MethodCallExpression? BuildInExpression(Expression propertyExpression, object propertyValue)
+  // Builds an "In" expression for filtering based on a list of values.
+  private static MethodCallExpression? BuildInExpression(Expression propertyExpression, object propertyValue)
   {
     if (propertyValue is not IEnumerable propertyValues) return null;
 
@@ -241,22 +246,22 @@ typeof(IEnumerable<byte>), typeof(IEnumerable<short>), typeof(IEnumerable<int>),
     return Expression.Call(enumerableContainsMethod.MakeGenericMethod(propertyExpression.Type), Expression.Constant(propertyValues), propertyExpression);
   }
 
-  // Determines if the property is a value type that can be used in comparisons.
-  private static bool IsValue(PropertyInfo property)
+  // Determines if the property is a value type that can be used in comparisons.
+  private static bool IsValue(PropertyInfo property)
   {
     Type type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
 
     return valueTypes.Contains(type);
   }
 
-  // Checks if the property is an enumerable filter.
-  private static bool IsEnumerableFilter(PropertyInfo property)
+  // Checks if the property is an enumerable filter.
+  private static bool IsEnumerableFilter(PropertyInfo property)
   {
     return property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(EnumerableFilter<>);
   }
 
-  // Checks if the property is a filter object.
-  private static bool IsFilter(PropertyInfo property)
+  // Checks if the property is a filter object.
+  private static bool IsFilter(PropertyInfo property)
   {
     return typeof(IFilter).IsAssignableFrom(property.PropertyType);
   }

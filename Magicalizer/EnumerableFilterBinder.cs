@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿// Copyright © 2025 Dmitry Sikorsky. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
 using Magicalizer.Filters.Abstractions;
@@ -6,8 +9,13 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Magicalizer;
 
+/// <summary>
+/// Binds an <see cref="EnumerableFilter{TFilter}"/> from the request values. The <see cref="IEnumerableFilter.Any"/>
+/// and <see cref="IEnumerableFilter.None"/> conditions can be specified either as a single filter or as a list of filters.
+/// </summary>
 public class EnumerableFilterBinder : IModelBinder
 {
+  // The cached properties of an enumerable filter type.
   private record EnumerableFilterPropertyCache(
     PropertyInfo? IsEmpty,
     PropertyInfo? IsNotEmpty,
@@ -18,11 +26,19 @@ public class EnumerableFilterBinder : IModelBinder
   private static readonly ConcurrentDictionary<Type, EnumerableFilterPropertyCache> propertiesByTypes = new();
   private readonly IModelBinderFactory binderFactory;
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="EnumerableFilterBinder"/> class.
+  /// </summary>
+  /// <param name="binderFactory">The factory that creates the binders for the filters of the collection elements.</param>
   public EnumerableFilterBinder(IModelBinderFactory binderFactory)
   {
     this.binderFactory = binderFactory;
   }
 
+  /// <summary>
+  /// Binds the enumerable filter from the request values.
+  /// </summary>
+  /// <param name="context">The model binding context.</param>
   public async Task BindModelAsync(ModelBindingContext context)
   {
     object enumerableFilter = Activator.CreateInstance(context.ModelType)!;
@@ -41,6 +57,7 @@ public class EnumerableFilterBinder : IModelBinder
     context.Result = ModelBindingResult.Success(enumerableFilter);
   }
 
+  // Binds a boolean property (e.g. IsEmpty) if its value is provided and valid.
   private void BindBoolProperty(ModelBindingContext context, object enumerableFilter, PropertyInfo? property, string propertyName)
   {
     if (property == null) return;
@@ -54,6 +71,8 @@ public class EnumerableFilterBinder : IModelBinder
       property.SetValue(enumerableFilter, value);
   }
 
+  // Binds a property that contains the filters of the collection elements (e.g. Any),
+  // trying to bind a single filter first, and then a list of filters.
   private async Task BindSingleFilterOrFilterList(ModelBindingContext context, object enumerableFilter, Type filterType, PropertyInfo? property, string propertyName)
   {
     if (property == null) return;
@@ -79,6 +98,7 @@ public class EnumerableFilterBinder : IModelBinder
       property.SetValue(enumerableFilter, filterList);
   }
 
+  // Tries to bind an object of the specified type using the given prefix. Returns null if nothing is bound.
   private async Task<object?> TryBind(ModelBindingContext context, Type filterType, string prefix)
   {
     context.Result = ModelBindingResult.Failed();

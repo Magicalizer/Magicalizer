@@ -29,12 +29,12 @@ public class DoubleFilter : IFilter
   public double? NotEquals { get; set; }
 
   /// <summary>
-  /// Specifies if the property value should be greater than the provided one.
+  /// Specifies if the property value should be greater than or equal to the provided one.
   /// </summary>
   public double? From { get; set; }
 
   /// <summary>
-  /// Specifies if the property value should be less than the provided one.
+  /// Specifies if the property value should be less than or equal to the provided one.
   /// </summary>
   public double? To { get; set; }
 
@@ -55,8 +55,8 @@ public class DoubleFilter : IFilter
   /// <param name="isNotNull">If the property value should be non-null.</param>
   /// <param name="equals">If the property value should be equal to the provided one.</param>
   /// <param name="notEquals">If the property value should not be equal to the provided one.</param>
-  /// <param name="from">If the property value should be greater than the provided one.</param>
-  /// <param name="to">If the property value should be less than the provided one.</param>
+  /// <param name="from">If the property value should be greater than or equal to the provided one.</param>
+  /// <param name="to">If the property value should be less than or equal to the provided one.</param>
   /// <param name="in">If the property value should be one of the provided comma-separated ones.</param>
   public DoubleFilter(bool? isNull = null, bool? isNotNull = null, double? equals = null, double? notEquals = null, double? from = null, double? to = null, IEnumerable<double>? @in = null)
   {

@@ -28,11 +28,11 @@ public class Sorting<TEntity> where TEntity : class, IEntity
   /// <summary>
   /// Initializes a new instance of the <see cref="Sorting{TEntity}"/> class using a sorting rule.
   /// </summary>
-  /// <param name="inclusion">The sorting rule.</param>
-  public Sorting(ISorting<IModel> inclusion)
+  /// <param name="sorting">The sorting rule.</param>
+  public Sorting(ISorting<IModel> sorting)
   {
-    this.IsAscending = inclusion.IsAscending;
-    this.PropertyPath = inclusion.PropertyPath;
+    this.IsAscending = sorting.IsAscending;
+    this.PropertyPath = sorting.PropertyPath;
   }
 
   /// <summary>

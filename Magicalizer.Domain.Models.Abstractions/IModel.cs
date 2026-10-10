@@ -30,7 +30,7 @@ public interface IModel<TEntity> : IModel where TEntity : class, IEntity
 /// Base interface for a model that can be mapped to an entity and queried using a filter.
 /// </summary>
 /// <typeparam name="TEntity">The entity type that this model maps to.</typeparam>
-/// <typeparam name="TFilter">he filter type used to query models.</typeparam>
+/// <typeparam name="TFilter">The filter type used to query models.</typeparam>
 public interface IModel<TEntity, TFilter> : IModel<TEntity>
   where TEntity : class, IEntity
   where TFilter : class, IFilter

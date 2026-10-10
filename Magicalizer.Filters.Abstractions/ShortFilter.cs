@@ -29,12 +29,12 @@ public class ShortFilter : IFilter
   public short? NotEquals { get; set; }
 
   /// <summary>
-  /// Specifies if the property value should be greater than the provided one.
+  /// Specifies if the property value should be greater than or equal to the provided one.
   /// </summary>
   public short? From { get; set; }
 
   /// <summary>
-  /// Specifies if the property value should be less than the provided one.
+  /// Specifies if the property value should be less than or equal to the provided one.
   /// </summary>
   public short? To { get; set; }
 
@@ -55,8 +55,8 @@ public class ShortFilter : IFilter
   /// <param name="isNotNull">If the property value should be non-null.</param>
   /// <param name="equals">If the property value should be equal to the provided one.</param>
   /// <param name="notEquals">If the property value should not be equal to the provided one.</param>
-  /// <param name="from">If the property value should be greater than the provided one.</param>
-  /// <param name="to">If the property value should be less than the provided one.</param>
+  /// <param name="from">If the property value should be greater than or equal to the provided one.</param>
+  /// <param name="to">If the property value should be less than or equal to the provided one.</param>
   /// <param name="in">If the property value should be one of the provided comma-separated ones.</param>
   public ShortFilter(bool? isNull = null, bool? isNotNull = null, short? equals = null, short? notEquals = null, short? from = null, short? to = null, IEnumerable<short>? @in = null)
   {

@@ -19,34 +19,34 @@ public class EnumerableFilter<TFilter> : IEnumerableFilter, IFilter where TFilte
   /// </summary>
   public bool? IsNotEmpty { get; set; }
 
-  /// <summary>
-  ///  Specifies a condition that at least one element in the collection must satisfy.
-  /// </summary>
-  public IEnumerable<TFilter>? Any { get; set; }
+  /// <summary>
+  /// Specifies a condition that at least one element in the collection must satisfy.
+  /// </summary>
+  public IEnumerable<TFilter>? Any { get; set; }
   IEnumerable<IFilter>? IEnumerableFilter.Any => Any?.Cast<IFilter>();
 
-  /// <summary>
-  ///  Specifies a condition that none of the elements in the collection should satisfy.
-  /// </summary>
-  public IEnumerable<TFilter>? None { get; set; }
+  /// <summary>
+  /// Specifies a condition that none of the elements in the collection should satisfy.
+  /// </summary>
+  public IEnumerable<TFilter>? None { get; set; }
   IEnumerable<IFilter>? IEnumerableFilter.None => None?.Cast<IFilter>();
 
-  /// <summary>
-  /// Initializes a new instance of the <see cref="EnumerableFilter{TFilter}"/> class.
-  /// </summary>
-  public EnumerableFilter() { }
+  /// <summary>
+  /// Initializes a new instance of the <see cref="EnumerableFilter{TFilter}"/> class.
+  /// </summary>
+  public EnumerableFilter() { }
 
-  /// <summary>
-  /// Initializes a new instance of the <see cref="EnumerableFilter{TFilter}"/> class with specific filter conditions.
-  /// </summary>
+  /// <summary>
+  /// Initializes a new instance of the <see cref="EnumerableFilter{TFilter}"/> class with specific filter conditions.
+  /// </summary>
   /// <param name="isEmpty">If true, the collection must be empty.</param>
   /// <param name="isNotEmpty">If true, the collection must be non-empty.</param>
-  /// <param name="any">A condition that at least one element must satisfy.</param>
-  /// <param name="none">A condition that no elements should satisfy.</param>
-  public EnumerableFilter(bool? isEmpty = null, bool? isNotEmpty = null, IEnumerable<TFilter>? any = default, IEnumerable<TFilter>? none = default)
+  /// <param name="any">A condition that at least one element must satisfy.</param>
+  /// <param name="none">A condition that no elements should satisfy.</param>
+  public EnumerableFilter(bool? isEmpty = null, bool? isNotEmpty = null, IEnumerable<TFilter>? any = default, IEnumerable<TFilter>? none = default)
   {
     this.IsEmpty = isEmpty;
-    this.IsNotEmpty = IsNotEmpty;
+    this.IsNotEmpty = isNotEmpty;
     this.Any = any;
     this.None = none;
   }

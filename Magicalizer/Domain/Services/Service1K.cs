@@ -17,6 +17,7 @@ namespace Magicalizer.Domain.Services;
 /// supporting CRUD, filtering, sorting, pagination, and inclusion.
 /// </summary>
 /// <typeparam name="TKey">The primary key type.</typeparam>
+/// <typeparam name="TEntity">The entity type.</typeparam>
 /// <typeparam name="TModel">The model type.</typeparam>
 /// <typeparam name="TFilter">The filter type.</typeparam>
 public class Service<TKey, TEntity, TModel, TFilter> : ServiceBase<TEntity, TModel, TFilter>, IService<TKey, TModel, TFilter>
@@ -36,9 +37,10 @@ where TFilter : class, IFilter
   /// Retrieves a model by its primary key.
   /// </summary>
   /// <param name="id">The value of the primary key.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <param name="inclusions">The inclusion rules (property paths of the related models to include).</param>
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
   /// <returns>The model with the specified primary key, or <c>null</c> if no such model exists.</returns>
-  public virtual async Task<TModel?> GetByIdAsync(TKey id, params IInclusion<TModel>[] inclusions)
+  public virtual async Task<TModel?> GetByIdAsync(TKey id, IEnumerable<IInclusion<TModel>>? inclusions = null, CancellationToken cancellationToken = default)
   {
     Microsoft.EntityFrameworkCore.Metadata.IProperty? key = this.GetPrimaryKeyProperty(0);
 
@@ -47,8 +49,8 @@ where TFilter : class, IFilter
     TFilter? filter = this.GetPreprocessedFilter();
     TEntity? entity = await this.GetPrefilteredQuery(filter)
       .ApplyFiltering(filter)
-      .ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)))
-      .FirstOrDefaultAsync(e => EF.Property<TKey>(e, key.Name)!.Equals(id));
+      .ApplyInclusions(inclusions?.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)))
+      .FirstOrDefaultAsync(e => EF.Property<TKey>(e, key.Name)!.Equals(id), cancellationToken);
 
     return this.EntityToModel(entity);
   }
@@ -57,11 +59,13 @@ where TFilter : class, IFilter
   /// Deletes a model by its primary key.
   /// </summary>
   /// <param name="id">The value of the primary key property.</param>
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
   /// <returns>A boolean indicating success.</returns>
-  public virtual async Task<bool> DeleteAsync(TKey id)
+  public virtual async Task<bool> DeleteAsync(TKey id, CancellationToken cancellationToken = default)
   {
     try
     {
+      // The entity is deleted without loading it, using a stub entity with only the primary key set.
       TEntity entity = new TEntity();
       Microsoft.EntityFrameworkCore.Metadata.IProperty? key = GetPrimaryKeyProperty(0);
 
@@ -73,7 +77,7 @@ where TFilter : class, IFilter
 
       property.SetValue(entity, id);
       this.dbContext.Set<TEntity>().Remove(entity);
-      await this.dbContext.SaveChangesAsync();
+      await this.dbContext.SaveChangesAsync(cancellationToken);
       return true;
     }
 

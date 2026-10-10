@@ -50,13 +50,18 @@ public class Sorting<TModel> : ISorting<TModel> where TModel : class, IModel
   /// Parses a string to create a new <see cref="Sorting{TModel}"/> instance.
   /// </summary>
   /// <param name="value">
-  /// A string representing the sorting direction and property path. The first character
-  /// determines the sort direction: '+' for ascending, '-' for descending. If no sign is present,
-  /// sorting defaults to ascending. The remaining characters represent the property path for sorting.
+  /// A string representing the property path for sorting, prefixed with '-' for descending order
+  /// (e.g. "name" or "-created").
   /// </param>
   /// <returns>A new <see cref="Sorting{TModel}"/> instance with the specified sorting direction and property path.</returns>
   public static Sorting<TModel> Parse(string value)
   {
-    return new Sorting<TModel>(value[0] != '-', (value[0] == '+' || value[0] == '-') ? value[1..] : value);
+    // The spaces around the value are ignored (e.g. in "name, -created").
+    value = value.Trim();
+
+    if (value.Length == 0)
+      return new Sorting<TModel>(true, value);
+
+    return value[0] == '-' ? new Sorting<TModel>(false, value[1..]) : new Sorting<TModel>(true, value);
   }
 }

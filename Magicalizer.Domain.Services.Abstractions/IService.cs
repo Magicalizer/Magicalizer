@@ -19,30 +19,41 @@ public interface IService<TModel, TFilter>
   /// Retrieves all the models that match filter with sorting, pagination, and inclusions.
   /// </summary>
   /// <param name="filter">The filter to query models.</param>
-  /// <param name="sortings">The sorting property paths with sorting direction.</param>
+  /// <param name="sortings">The sorting rules (property paths with sorting directions).</param>
   /// <param name="offset">The number of models to skip.</param>
   /// <param name="limit">The maximum number of models to return.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <param name="inclusions">The inclusion rules (property paths of the related models to include).</param>
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
   /// <returns>The collection of models that match the filter.</returns>
-  Task<IEnumerable<TModel>> GetAllAsync(TFilter? filter = null, IEnumerable<ISorting<TModel>>? sortings = null, int? offset = null, int? limit = null, params IInclusion<TModel>[] inclusions);
+  Task<IEnumerable<TModel>> GetAllAsync(TFilter? filter = null, IEnumerable<ISorting<TModel>>? sortings = null, int? offset = null, int? limit = null, IEnumerable<IInclusion<TModel>>? inclusions = null, CancellationToken cancellationToken = default);
 
   /// <summary>
   /// Retrieves the total count of models that match the optional filter.
   /// </summary>
   /// <param name="filter">The filter to count models.</param>
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
   /// <returns>The count of models that match the filter.</returns>
-  Task<int> CountAsync(TFilter? filter = null);
+  Task<int> CountAsync(TFilter? filter = null, CancellationToken cancellationToken = default);
 
   /// <summary>
   /// Creates a new model and returns it.
   /// </summary>
   /// <param name="model">The model to create.</param>
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
   /// <returns>The created model.</returns>
-  Task<TModel> CreateAsync(TModel model);
+  Task<TModel> CreateAsync(TModel model, CancellationToken cancellationToken = default);
 
   /// <summary>
   /// Updates an existing model.
   /// </summary>
   /// <param name="model">The model to update.</param>
-  Task EditAsync(TModel model);
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
+  Task EditAsync(TModel model, CancellationToken cancellationToken = default);
+
+  /// <summary>
+  /// Gets the primary key values of a model (e.g. to build the URL of a created model).
+  /// </summary>
+  /// <param name="model">The model to get the primary key values of.</param>
+  /// <returns>The primary key values in the order of the primary key properties.</returns>
+  object?[] GetKeyValues(TModel model);
 }

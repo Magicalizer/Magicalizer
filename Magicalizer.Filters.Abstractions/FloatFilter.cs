@@ -29,12 +29,12 @@ public class FloatFilter : IFilter
   public float? NotEquals { get; set; }
 
   /// <summary>
-  /// Specifies if the property value should be greater than the provided one.
+  /// Specifies if the property value should be greater than or equal to the provided one.
   /// </summary>
   public float? From { get; set; }
 
   /// <summary>
-  /// Specifies if the property value should be less than the provided one.
+  /// Specifies if the property value should be less than or equal to the provided one.
   /// </summary>
   public float? To { get; set; }
 
@@ -55,8 +55,8 @@ public class FloatFilter : IFilter
   /// <param name="isNotNull">If the property value should be non-null.</param>
   /// <param name="equals">If the property value should be equal to the provided one.</param>
   /// <param name="notEquals">If the property value should not be equal to the provided one.</param>
-  /// <param name="from">If the property value should be greater than the provided one.</param>
-  /// <param name="to">If the property value should be less than the provided one.</param>
+  /// <param name="from">If the property value should be greater than or equal to the provided one.</param>
+  /// <param name="to">If the property value should be less than or equal to the provided one.</param>
   /// <param name="in">If the property value should be one of the provided comma-separated ones.</param>
   public FloatFilter(bool? isNull = null, bool? isNotNull = null, float? equals = null, float? notEquals = null, float? from = null, float? to = null, IEnumerable<float>? @in = null)
   {

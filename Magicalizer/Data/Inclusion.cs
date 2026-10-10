@@ -20,7 +20,7 @@ public class Inclusion<TEntity> where TEntity : class, IEntity
   /// </summary>
   public string PropertyPath { get; }
 
-  // <summary>
+  /// <summary>
   /// Initializes a new instance of the <see cref="Inclusion{TEntity}"/> class using an inclusion rule.
   /// </summary>
   /// <param name="inclusion">The inclusion rule.</param>

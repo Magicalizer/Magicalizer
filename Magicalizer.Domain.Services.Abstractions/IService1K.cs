@@ -21,14 +21,16 @@ public interface IService<TKey, TModel, TFilter> : IService<TModel, TFilter>
   /// Retrieves a model by its primary key.
   /// </summary>
   /// <param name="id">The value of the primary key.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <param name="inclusions">The inclusion rules (property paths of the related models to include).</param>
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
   /// <returns>The model with the specified primary key, or <c>null</c> if no such model exists.</returns>
-  Task<TModel?> GetByIdAsync(TKey id, params IInclusion<TModel>[] inclusions);
+  Task<TModel?> GetByIdAsync(TKey id, IEnumerable<IInclusion<TModel>>? inclusions = null, CancellationToken cancellationToken = default);
 
   /// <summary>
   /// Deletes a model by its primary key.
   /// </summary>
   /// <param name="id">The value of the primary key property.</param>
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
   /// <returns>A boolean indicating success.</returns>
-  Task<bool> DeleteAsync(TKey id);
+  Task<bool> DeleteAsync(TKey id, CancellationToken cancellationToken = default);
 }

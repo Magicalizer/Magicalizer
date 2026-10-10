@@ -8,10 +8,33 @@ namespace Magicalizer.Api.Dto.Abstractions;
 /// </summary>
 public enum HttpMethod
 {
+  /// <summary>
+  /// Any HTTP method.
+  /// </summary>
   Any,
+
+  /// <summary>
+  /// The GET method (getting a model or a list of models).
+  /// </summary>
   Get,
+
+  /// <summary>
+  /// The POST method (creating a model).
+  /// </summary>
   Post,
+
+  /// <summary>
+  /// The PUT method (updating a model).
+  /// </summary>
   Put,
+
+  /// <summary>
+  /// The PATCH method (partially updating a model).
+  /// </summary>
   Patch,
+
+  /// <summary>
+  /// The DELETE method (deleting a model).
+  /// </summary>
   Delete
 }

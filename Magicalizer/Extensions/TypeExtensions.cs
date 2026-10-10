@@ -1,6 +1,8 @@
 ﻿// Copyright © 2025 Dmitry Sikorsky. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using Magicalizer.Data.Entities.Abstractions;
+
 namespace Magicalizer.Extensions;
 
 /// <summary>
@@ -47,5 +49,21 @@ public static class TypeExtensions
     Type? genericInterfaceType = type.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericInterfaceBaseType);
 
     return genericInterfaceType?.GetGenericArguments();
+  }
+
+  /// <summary>
+  /// Gets the primary key types of an entity (the type parameters of its <c>IEntity</c> interface with the most of them,
+  /// as an entity with a composite primary key implements all the "smaller" interfaces too).
+  /// </summary>
+  /// <param name="entityType">The entity type.</param>
+  /// <returns>The primary key types, or <c>null</c> if the entity doesn't implement any of the <c>IEntity</c> interfaces with a primary key.</returns>
+  internal static Type[]? GetEntityKeyTypes(this Type entityType)
+  {
+    Type[] keyInterfaces = [typeof(IEntity<>), typeof(IEntity<,>), typeof(IEntity<,,>)];
+
+    return entityType.GetInterfaces()
+      .Where(i => i.IsGenericType && keyInterfaces.Contains(i.GetGenericTypeDefinition()))
+      .MaxBy(i => i.GetGenericArguments().Length)?
+      .GetGenericArguments();
   }
 }

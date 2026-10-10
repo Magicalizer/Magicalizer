@@ -39,9 +39,10 @@ public class Service<TKey1, TKey2, TEntity, TModel, TFilter> : ServiceBase<TEnti
   /// </summary>
   /// <param name="id1">The value of the first property in the composite primary key.</param>
   /// <param name="id2">The value of the second property in the composite primary key.</param>
-  /// <param name="inclusions">The inclusion property paths to include related models.</param>
+  /// <param name="inclusions">The inclusion rules (property paths of the related models to include).</param>
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
   /// <returns>The model with the specified composite primary key, or <c>null</c> if no such model exists.</returns>
-  public virtual async Task<TModel?> GetByIdAsync(TKey1 id1, TKey2 id2, params IInclusion<TModel>[] inclusions)
+  public virtual async Task<TModel?> GetByIdAsync(TKey1 id1, TKey2 id2, IEnumerable<IInclusion<TModel>>? inclusions = null, CancellationToken cancellationToken = default)
   {
     Microsoft.EntityFrameworkCore.Metadata.IProperty? key1 = this.GetPrimaryKeyProperty(0);
     Microsoft.EntityFrameworkCore.Metadata.IProperty? key2 = this.GetPrimaryKeyProperty(1);
@@ -51,10 +52,11 @@ public class Service<TKey1, TKey2, TEntity, TModel, TFilter> : ServiceBase<TEnti
     TFilter? filter = this.GetPreprocessedFilter();
     TEntity? entity = await this.GetPrefilteredQuery(filter)
       .ApplyFiltering(filter)
-      .ApplyInclusions(inclusions.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)))
+      .ApplyInclusions(inclusions?.Select(i => new Data.Inclusion<TEntity>(i.PropertyPath)))
       .FirstOrDefaultAsync(
         e => EF.Property<TKey1>(e, key1.Name)!.Equals(id1) &&
-             EF.Property<TKey2>(e, key2.Name)!.Equals(id2)
+             EF.Property<TKey2>(e, key2.Name)!.Equals(id2),
+        cancellationToken
       );
 
     return this.EntityToModel(entity);
@@ -65,11 +67,13 @@ public class Service<TKey1, TKey2, TEntity, TModel, TFilter> : ServiceBase<TEnti
   /// </summary>
   /// <param name="id1">The value of the first property in the composite primary key.</param>
   /// <param name="id2">The value of the second property in the composite primary key.</param>
+  /// <param name="cancellationToken">The token to cancel the operation.</param>
   /// <returns>A boolean indicating success.</returns>
-  public virtual async Task<bool> DeleteAsync(TKey1 id1, TKey2 id2)
+  public virtual async Task<bool> DeleteAsync(TKey1 id1, TKey2 id2, CancellationToken cancellationToken = default)
   {
     try
     {
+      // The entity is deleted without loading it, using a stub entity with only the primary key set.
       TEntity entity = new TEntity();
       Microsoft.EntityFrameworkCore.Metadata.IProperty? key1 = GetPrimaryKeyProperty(0);
       Microsoft.EntityFrameworkCore.Metadata.IProperty? key2 = GetPrimaryKeyProperty(1);
@@ -84,7 +88,7 @@ public class Service<TKey1, TKey2, TEntity, TModel, TFilter> : ServiceBase<TEnti
       property1.SetValue(entity, id1);
       property2.SetValue(entity, id2);
       this.dbContext.Set<TEntity>().Remove(entity);
-      await this.dbContext.SaveChangesAsync();
+      await this.dbContext.SaveChangesAsync(cancellationToken);
       return true;
     }
 
