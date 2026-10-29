@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
       setupAction.Conventions.Add(new MagicalizedControllerRouteConvention());
       setupAction.Conventions.Add(new MagicalizedControllerHttpMethodConvention());
       setupAction.Conventions.Add(new MagicalizedControllerAuthorizationConvention());
+      setupAction.Conventions.Add(new MagicalizedControllerApiExplorerConvention());
       setupAction.ModelMetadataDetailsProviders.Add(new DtoValidationMetadataProvider());
     });
 
