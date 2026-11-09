@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Description>Creates a fully featured REST API ASP.NET Core web application from the DTO, model and entity classes: CRUD, filtering, sorting, paging, inclusion, validation, authorization and OpenAPI.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch.SystemTextJson" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Magicalizer.Api.Dto.Abstractions\Magicalizer.Api.Dto.Abstractions.csproj" />
+    <ProjectReference Include="..\Magicalizer.Domain.Services.Abstractions\Magicalizer.Domain.Services.Abstractions.csproj" />
+    <ProjectReference Include="..\Magicalizer.Validators.Abstractions\Magicalizer.Validators.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Magicalizer.UnitTests" />
+  </ItemGroup>
+
+</Project>

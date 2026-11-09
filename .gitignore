@@ -4,3 +4,4 @@ obj/
 *.user
 pack.bat
 push.bat
+TestResults/

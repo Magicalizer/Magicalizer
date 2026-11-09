@@ -1,0 +1,9 @@
+version = 1
+
+# Covers the files without their own SPDX header (the sample apps, the project files, the Markdown files, the images
+# and so on). A file's own header takes precedence.
+[[annotations]]
+path = "**"
+precedence = "closest"
+SPDX-FileCopyrightText = "Dmitry Sikorsky <dmitry@sikorsky.pro>"
+SPDX-License-Identifier = "Apache-2.0"

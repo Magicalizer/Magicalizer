@@ -1,0 +1,44 @@
+﻿{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src",
+          "files": [ "**/*.csproj" ]
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [ "**/*.{md,yml}" ],
+        "exclude": [ "_site/**", "samples/**", "README.md" ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [ "images/**" ]
+      }
+    ],
+    "output": "_site",
+    "template": [ "default", "modern", "template" ],
+    "globalMetadata": {
+      "_appName": "Magicalizer",
+      "_appTitle": "Magicalizer",
+      "_appLogoPath": "images/logo.svg",
+      "_appFaviconPath": "images/logo.svg",
+      "_appFooter": "© 2020–2026 Dmitry Sikorsky · <a href=\"https://magicalizer.net/\">magicalizer.net</a> · <a href=\"https://github.com/Magicalizer/Magicalizer\">GitHub</a>",
+      "_enableSearch": true,
+      "_gitContribute": {
+        "repo": "https://github.com/Magicalizer/Magicalizer",
+        "branch": "main"
+      }
+    },
+    "sitemap": {
+      "baseUrl": "https://docs.magicalizer.net/"
+    }
+  }
+}

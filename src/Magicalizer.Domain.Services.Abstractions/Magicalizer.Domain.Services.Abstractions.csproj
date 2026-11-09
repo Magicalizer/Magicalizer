@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Abstractions of the Magicalizer services: IService, the query prefilters, the inclusion and sorting, and the exceptions of the services.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Magicalizer.Domain.Models.Abstractions\Magicalizer.Domain.Models.Abstractions.csproj" />
+    <ProjectReference Include="..\Magicalizer.Filters.Abstractions\Magicalizer.Filters.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

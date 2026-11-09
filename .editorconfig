@@ -1,0 +1,153 @@
+# The code style of Magicalizer. The options are grouped and ordered as in the file "dotnet new editorconfig" creates,
+# the ones that describe a choice of the style are set explicitly even if they match the defaults.
+
+root = true
+
+# Core options.
+
+[*]
+charset = utf-8-bom
+end_of_line = crlf
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Git, EditorConfig and REUSE files are plain UTF-8, without BOM.
+[{.editorconfig,.gitattributes,.gitignore,REUSE.toml}]
+charset = utf-8
+
+# Two trailing spaces are a line break in Markdown.
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+
+# .NET coding conventions: usings.
+dotnet_separate_import_directive_groups = false
+dotnet_sort_system_directives_first = true
+
+# .NET coding conventions: members are always accessed with "this.".
+dotnet_style_qualification_for_event = true:warning
+dotnet_style_qualification_for_field = true:warning
+dotnet_style_qualification_for_method = true:warning
+dotnet_style_qualification_for_property = true:warning
+
+# .NET coding conventions: the language keywords are used instead of the BCL type names.
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_predefined_type_for_member_access = true:warning
+
+# .NET coding conventions: the accessibility modifiers are always written.
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+
+# C# coding conventions: the types are explicit ("var" is used only for the anonymous ones).
+csharp_style_var_elsewhere = false:warning
+csharp_style_var_for_built_in_types = false:warning
+csharp_style_var_when_type_is_apparent = false:warning
+
+# C# coding conventions: code blocks. The braces are omitted for a single statement, even a multiline one (they are
+# only used for several statements or a nested control statement, see CONVENTIONS.md).
+csharp_prefer_braces = false
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_prefer_primary_constructors = false:warning
+
+# C# coding conventions: usings are outside the namespace.
+csharp_using_directive_placement = outside_namespace:warning
+
+# C# formatting: the braces of the declarations and the statements are on a new line, the ones inside the expressions
+# (lambdas, anonymous methods and types, initializers) are on the same line.
+csharp_new_line_before_catch = true
+csharp_new_line_before_else = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_open_brace = accessors, control_blocks, events, indexers, local_functions, methods, properties, types
+
+# Naming rules. The more specific ones take precedence, so the order doesn't matter, they are listed from the types
+# to the locals.
+dotnet_naming_rule.interfaces_should_start_with_i.severity = warning
+dotnet_naming_rule.interfaces_should_start_with_i.style = pascal_case_with_i_prefix
+dotnet_naming_rule.interfaces_should_start_with_i.symbols = interfaces
+
+dotnet_naming_rule.type_parameters_should_start_with_t.severity = warning
+dotnet_naming_rule.type_parameters_should_start_with_t.style = pascal_case_with_t_prefix
+dotnet_naming_rule.type_parameters_should_start_with_t.symbols = type_parameters
+
+dotnet_naming_rule.types_and_members_should_be_pascal_case.severity = warning
+dotnet_naming_rule.types_and_members_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.types_and_members_should_be_pascal_case.symbols = types_and_members
+
+dotnet_naming_rule.async_methods_should_end_with_async.severity = warning
+dotnet_naming_rule.async_methods_should_end_with_async.style = pascal_case_with_async_suffix
+dotnet_naming_rule.async_methods_should_end_with_async.symbols = async_methods
+
+dotnet_naming_rule.public_fields_should_be_pascal_case.severity = warning
+dotnet_naming_rule.public_fields_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.public_fields_should_be_pascal_case.symbols = public_fields
+
+dotnet_naming_rule.non_public_constants_should_be_pascal_case.severity = warning
+dotnet_naming_rule.non_public_constants_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.non_public_constants_should_be_pascal_case.symbols = non_public_constants
+
+dotnet_naming_rule.non_public_static_readonly_fields_should_be_pascal_case.severity = warning
+dotnet_naming_rule.non_public_static_readonly_fields_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.non_public_static_readonly_fields_should_be_pascal_case.symbols = non_public_static_readonly_fields
+
+dotnet_naming_rule.non_public_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.non_public_fields_should_be_camel_case.style = camel_case
+dotnet_naming_rule.non_public_fields_should_be_camel_case.symbols = non_public_fields
+
+dotnet_naming_rule.parameters_and_locals_should_be_camel_case.severity = warning
+dotnet_naming_rule.parameters_and_locals_should_be_camel_case.style = camel_case
+dotnet_naming_rule.parameters_and_locals_should_be_camel_case.symbols = parameters_and_locals
+
+# Symbol specifications.
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+
+dotnet_naming_symbols.type_parameters.applicable_accessibilities = *
+dotnet_naming_symbols.type_parameters.applicable_kinds = type_parameter
+
+dotnet_naming_symbols.types_and_members.applicable_accessibilities = *
+dotnet_naming_symbols.types_and_members.applicable_kinds = namespace, class, struct, enum, delegate, property, method, event, local_function
+
+dotnet_naming_symbols.async_methods.applicable_accessibilities = *
+dotnet_naming_symbols.async_methods.applicable_kinds = method, local_function
+dotnet_naming_symbols.async_methods.required_modifiers = async
+
+dotnet_naming_symbols.public_fields.applicable_accessibilities = public
+dotnet_naming_symbols.public_fields.applicable_kinds = field
+
+dotnet_naming_symbols.non_public_constants.applicable_accessibilities = internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.non_public_constants.applicable_kinds = field
+dotnet_naming_symbols.non_public_constants.required_modifiers = const
+
+dotnet_naming_symbols.non_public_static_readonly_fields.applicable_accessibilities = internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.non_public_static_readonly_fields.applicable_kinds = field
+dotnet_naming_symbols.non_public_static_readonly_fields.required_modifiers = static, readonly
+
+dotnet_naming_symbols.non_public_fields.applicable_accessibilities = internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.non_public_fields.applicable_kinds = field
+
+dotnet_naming_symbols.parameters_and_locals.applicable_accessibilities = *
+dotnet_naming_symbols.parameters_and_locals.applicable_kinds = parameter, local
+
+# Naming styles.
+dotnet_naming_style.camel_case.capitalization = camel_case
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.pascal_case_with_async_suffix.capitalization = pascal_case
+dotnet_naming_style.pascal_case_with_async_suffix.required_suffix = Async
+
+dotnet_naming_style.pascal_case_with_i_prefix.capitalization = pascal_case
+dotnet_naming_style.pascal_case_with_i_prefix.required_prefix = I
+
+dotnet_naming_style.pascal_case_with_t_prefix.capitalization = pascal_case
+dotnet_naming_style.pascal_case_with_t_prefix.required_prefix = T
+
+# Checked by the build too.
+dotnet_diagnostic.IDE0005.severity = warning
+dotnet_diagnostic.IDE1006.severity = warning
+dotnet_diagnostic.CA1852.severity = warning
+# The parameters of an implemented or overridden method are named as in the base one, so <inheritdoc/> documents
+# them too.
+dotnet_diagnostic.CA1725.severity = warning

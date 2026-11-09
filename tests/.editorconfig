@@ -1,0 +1,3 @@
+# The tests are named after the scenario (Method_Condition_Result), so the async ones have no Async suffix.
+[*Tests.cs]
+dotnet_naming_rule.async_methods_should_end_with_async.severity = none

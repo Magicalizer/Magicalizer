@@ -1,0 +1,92 @@
+﻿- name: Introduction
+  items:
+  - name: What is Magicalizer
+    href: introduction/what-is-magicalizer.md
+  - name: How it works
+    href: introduction/how-it-works.md
+  - name: Packages and layers
+    href: introduction/packages-and-layers.md
+  - name: Requirements
+    href: introduction/requirements.md
+- name: Getting started
+  items:
+  - name: Installation
+    href: getting-started/installation.md
+  - name: Your first API
+    href: getting-started/your-first-api.md
+  - name: A layered solution
+    href: getting-started/layered-solution.md
+- name: Building blocks
+  items:
+  - name: Entities
+    href: building-blocks/entities.md
+  - name: Models
+    href: building-blocks/models.md
+  - name: DTOs
+    href: building-blocks/dtos.md
+  - name: Filters
+    href: building-blocks/filters.md
+  - name: Validators
+    href: building-blocks/validators.md
+  - name: Type discovery
+    href: building-blocks/type-discovery.md
+- name: HTTP API
+  items:
+  - name: Endpoints
+    href: http-api/endpoints.md
+  - name: Filtering
+    href: http-api/filtering.md
+  - name: Sorting
+    href: http-api/sorting.md
+  - name: Paging
+    href: http-api/paging.md
+  - name: Inclusion
+    href: http-api/inclusion.md
+  - name: Errors
+    href: http-api/errors.md
+- name: Customization
+  items:
+  - name: HTTP methods
+    href: customization/http-methods.md
+  - name: Authorization
+    href: customization/authorization.md
+  - name: Custom services
+    href: customization/custom-services.md
+  - name: Query prefilters
+    href: customization/query-prefilters.md
+  - name: Custom controllers
+    href: customization/custom-controllers.md
+  - name: OpenAPI
+    href: customization/openapi.md
+  - name: Options
+    href: customization/options.md
+- name: Recipes
+  items:
+  - name: Users see only their own data
+    href: recipes/own-data.md
+  - name: Soft deletion
+    href: recipes/soft-deletion.md
+  - name: Localization
+    href: recipes/localization.md
+  - name: PostgreSQL and SQL Server
+    href: recipes/postgresql-and-sql-server.md
+  - name: Browser clients
+    href: recipes/browser-clients.md
+  - name: Testing
+    href: recipes/testing.md
+  - name: Performance
+    href: recipes/performance.md
+- name: Troubleshooting
+  items:
+  - name: Startup diagnostics
+    href: troubleshooting/startup-diagnostics.md
+  - name: FAQ
+    href: troubleshooting/faq.md
+- name: About
+  items:
+  - name: What’s new
+    href: about/whats-new.md
+  - name: Contributing
+    href: about/contributing.md
+  - name: License
+    href: about/license.md

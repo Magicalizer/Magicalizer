@@ -1,0 +1,46 @@
+﻿/* Magicalizer documentation: the brand color of the logo (as on magicalizer.net) instead of the Bootstrap blue. */
+:root,
+[data-bs-theme="light"] {
+  --bs-primary: #cc1199;
+  --bs-primary-rgb: 204, 17, 153;
+  --bs-link-color: #cc1199;
+  --bs-link-color-rgb: 204, 17, 153;
+  --bs-link-hover-color: #aa1188;
+  --bs-link-hover-color-rgb: 170, 17, 136;
+}
+
+[data-bs-theme="dark"] {
+  --bs-primary: #cc1199;
+  --bs-primary-rgb: 204, 17, 153;
+  --bs-link-color: #ee77cc;
+  --bs-link-color-rgb: 238, 119, 204;
+  --bs-link-hover-color: #ff99dd;
+  --bs-link-hover-color-rgb: 255, 153, 221;
+}
+
+/* The logo has the size of the text of the navigation bar. */
+#logo {
+  width: 2rem;
+  height: 2rem;
+  margin-right: .5rem;
+}
+
+/* The focus of the fields and buttons in the brand color (Bootstrap compiles its own blue into them). */
+:root {
+  --bs-focus-ring-color: rgba(var(--bs-primary-rgb), .25);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: rgba(var(--bs-primary-rgb), .5);
+  box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), .25);
+}
+
+.btn:focus-visible {
+  box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), .25);
+}
+
+/* The table of contents clips what is outside of it, so the filter leaves room for its focus ring. */
+.toc-offcanvas .filter {
+  margin: .25rem .25rem .5rem;
+}

@@ -1,0 +1,7 @@
+﻿<Solution>
+  <Project Path="App/App.csproj" />
+  <Project Path="App.Api.Dto/App.Api.Dto.csproj" />
+  <Project Path="App.Data.Entities/App.Data.Entities.csproj" />
+  <Project Path="App.Domain.Models/App.Domain.Models.csproj" />
+  <Project Path="App.Filters/App.Filters.csproj" />
+</Solution>

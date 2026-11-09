@@ -1,0 +1,33 @@
+﻿// SPDX-FileCopyrightText: Dmitry Sikorsky <dmitry@sikorsky.pro>
+// SPDX-License-Identifier: Apache-2.0
+
+namespace Magicalizer.Domain.Services.Abstractions;
+
+/// <summary>
+/// Exception that is thrown if a model with the same primary key already exists. The API returns 409 Conflict for it.
+/// </summary>
+public class ModelAlreadyExistsException : Exception
+{
+  /// <summary>
+  /// Model type.
+  /// </summary>
+  public Type ModelType { get; }
+
+  /// <summary>
+  /// Primary key values of the model.
+  /// </summary>
+  public object?[] KeyValues { get; }
+
+  /// <summary>
+  /// Creates an exception.
+  /// </summary>
+  /// <param name="modelType">Model type.</param>
+  /// <param name="keyValues">Primary key values of the model.</param>
+  /// <param name="innerException">Database exception that caused this one.</param>
+  public ModelAlreadyExistsException(Type modelType, object?[] keyValues, Exception? innerException = null)
+    : base($"The model with the primary key ({string.Join(", ", keyValues)}) already exists.", innerException)
+  {
+    this.ModelType = modelType;
+    this.KeyValues = keyValues;
+  }
+}

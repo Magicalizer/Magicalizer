@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Abstractions of the Magicalizer filters: IFilter and the filters of numbers, strings, booleans, dates and times, GUIDs, enums and collections.</Description>
+  </PropertyGroup>
+
+</Project>

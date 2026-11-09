@@ -1,0 +1,23 @@
+﻿<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="src/Directory.Build.props" />
+    <File Path="src/Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/Magicalizer/">
+    <Project Path="src/Magicalizer.Data.Entities.Abstractions/Magicalizer.Data.Entities.Abstractions.csproj" />
+    <Project Path="src/Magicalizer.Filters.Abstractions/Magicalizer.Filters.Abstractions.csproj" />
+    <Project Path="src/Magicalizer.Domain.Models.Abstractions/Magicalizer.Domain.Models.Abstractions.csproj" />
+    <Project Path="src/Magicalizer.Domain.Services.Abstractions/Magicalizer.Domain.Services.Abstractions.csproj" />
+    <Project Path="src/Magicalizer.Api.Dto.Abstractions/Magicalizer.Api.Dto.Abstractions.csproj" />
+    <Project Path="src/Magicalizer.Validators.Abstractions/Magicalizer.Validators.Abstractions.csproj" />
+    <Project Path="src/Magicalizer/Magicalizer.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <File Path="tests/Directory.Build.props" />
+    <File Path="tests/Directory.Packages.props" />
+    <File Path="tests/README.md" />
+    <Project Path="tests/Magicalizer.TestHost/Magicalizer.TestHost.csproj" />
+    <Project Path="tests/Magicalizer.UnitTests/Magicalizer.UnitTests.csproj" />
+    <Project Path="tests/Magicalizer.IntegrationTests/Magicalizer.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Abstractions of the Magicalizer entities: IEntity with a primary key of one, two or three properties.</Description>
+  </PropertyGroup>
+
+</Project>

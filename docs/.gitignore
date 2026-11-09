@@ -1,0 +1,3 @@
+# Only the generated folders at the root of the documentation (not the Api folders of the samples).
+/_site/
+/api/

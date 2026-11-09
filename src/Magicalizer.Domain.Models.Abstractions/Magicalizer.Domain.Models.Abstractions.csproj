@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Abstractions of the Magicalizer models: IModel, which binds a model to its entity and filter.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Magicalizer.Data.Entities.Abstractions\Magicalizer.Data.Entities.Abstractions.csproj" />
+    <ProjectReference Include="..\Magicalizer.Filters.Abstractions\Magicalizer.Filters.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

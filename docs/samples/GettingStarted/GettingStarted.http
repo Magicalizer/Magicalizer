@@ -1,0 +1,101 @@
+﻿@host = http://localhost:5000
+
+# Create
+
+POST {{host}}/v1/categories
+Content-Type: application/json
+
+{"name": "Pizza"}
+
+###
+
+POST {{host}}/v1/categories
+Content-Type: application/json
+
+{"name": "Sushi"}
+
+###
+
+POST {{host}}/v1/products
+Content-Type: application/json
+
+{"category": {"id": 1}, "name": "Margherita", "price": 9.5}
+
+###
+
+POST {{host}}/v1/products
+Content-Type: application/json
+
+{"category": {"id": 1}, "name": "Quattro Formaggi", "price": 12}
+
+###
+
+POST {{host}}/v1/products
+Content-Type: application/json
+
+{"category": {"id": 2}, "name": "Philadelphia", "price": 11}
+
+###
+
+POST {{host}}/v1/photos
+Content-Type: application/json
+
+{"product": {"id": 1}, "filename": "margherita.jpg"}
+
+###
+
+# A category that doesn't exist: 400
+
+POST {{host}}/v1/products
+Content-Type: application/json
+
+{"category": {"id": 99}, "name": "Ghost", "price": 1}
+
+###
+
+# Validate: 400 with all the errors
+
+POST {{host}}/v1/products
+Content-Type: application/json
+
+{"category": {"id": 1}, "name": "", "price": 0}
+
+###
+
+# Query
+
+GET {{host}}/v1/products?category.name.equals=Pizza&sort=-price
+
+###
+
+GET {{host}}/v1/categories/1?include=products.photos
+
+###
+
+GET {{host}}/v1/products?sort=name&offset=0&limit=2
+
+###
+
+# Mistakes in a query: 400 with all of them
+
+GET {{host}}/v1/products?naem.contains=pep&sort=colour
+
+###
+
+# Update and delete
+
+PUT {{host}}/v1/categories
+Content-Type: application/json
+
+{"id": 2, "name": "Sushi and rolls"}
+
+###
+
+PATCH {{host}}/v1/categories/2
+Content-Type: application/json-patch+json
+
+[{"op": "replace", "path": "/name", "value": "Rolls"}]
+
+###
+
+DELETE {{host}}/v1/photos/1

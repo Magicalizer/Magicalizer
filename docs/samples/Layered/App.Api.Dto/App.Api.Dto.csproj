@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Magicalizer.Api.Dto.Abstractions\Magicalizer.Api.Dto.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Magicalizer.Validators.Abstractions\Magicalizer.Validators.Abstractions.csproj" />
+    <ProjectReference Include="..\App.Domain.Models\App.Domain.Models.csproj" />
+  </ItemGroup>
+
+</Project>

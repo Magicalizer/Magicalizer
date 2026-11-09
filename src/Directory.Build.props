@@ -1,0 +1,47 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VersionPrefix>7.0.0</VersionPrefix>
+    <VersionSuffix>beta3</VersionSuffix>
+    <Authors>Dmitry Sikorsky</Authors>
+    <Copyright>Copyright © 2020-2026 Dmitry Sikorsky</Copyright>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>rest;api;crud;aspnetcore;entityframeworkcore;filtering;sorting;paging;openapi</PackageTags>
+    <PackageProjectUrl>https://magicalizer.net/</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Magicalizer/Magicalizer</RepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <ContinuousIntegrationBuild Condition="'$(Configuration)' == 'Release'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)..\NOTICE.txt" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!-- The sources are published on GitHub, whatever the remote of the local repository is. -->
+  <Target Name="UseRepositoryUrlForSourceLink" AfterTargets="InitializeSourceControlInformationFromSourceControlManager">
+    <ItemGroup>
+      <SourceRoot Condition="'%(SourceRoot.SourceControl)' == 'git'">
+        <ScmRepositoryUrl>$(RepositoryUrl)</ScmRepositoryUrl>
+      </SourceRoot>
+    </ItemGroup>
+  </Target>
+
+</Project>

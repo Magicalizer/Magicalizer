@@ -1,0 +1,2 @@
+# The text files are stored with LF and checked out with CRLF, whatever the Git settings of the machine are.
+* text=auto eol=crlf
